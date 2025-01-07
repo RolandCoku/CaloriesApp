@@ -10,11 +10,12 @@ public class RegisterUserDTO {
     public RegisterUserDTO() {
     }
 
-    public RegisterUserDTO(String username, String email, String password, Long roleId) {
+    public RegisterUserDTO(String username, String email, String password, Long roleId, String confirmPassword) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.roleId = roleId;
+        this.confirmPassword = confirmPassword;
     }
 
     public String getUsername() {

@@ -33,7 +33,11 @@ public class UserServiceImpl implements UserService {
         user.setUsername(registerUserDTO.getUsername());
         user.setEmail(registerUserDTO.getEmail());
 
-        //TODO: Hash the password before saving it
+        //Check if the password and password confirmation match
+        if (!registerUserDTO.getPassword().equals(registerUserDTO.getConfirmPassword())) {
+            throw new RuntimeException("Passwords do not match");
+        }
+
         user.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
 
         Role role = roleRepository.findById(registerUserDTO.getRoleId())

@@ -1,5 +1,8 @@
 package org.springboot.caloriesapp.service;
 
+import org.springboot.caloriesapp.dto.LoginDTO;
+import org.springframework.http.ResponseEntity;
+
 public interface AuthService {
-    String login(String username, String password);
+    ResponseEntity<String> login(LoginDTO loginDTO);
 }
