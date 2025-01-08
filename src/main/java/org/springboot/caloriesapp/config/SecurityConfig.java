@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/register", "/login", "/css/**", "/images/**").permitAll() // Public endpoints
-                        .anyRequest().permitAll() //TODO: Change to authenticated() when implementing security
+                        .anyRequest().authenticated() // All other endpoints require authentication
                 )
                 .formLogin(form -> form
                         .loginPage("/login") // Custom login page

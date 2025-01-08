@@ -21,6 +21,11 @@ public class FoodEntryServiceImpl implements FoodEntryService {
     }
 
     @Override
+    public int getTotalCalories() {
+        return 0;
+    }
+
+    @Override
     public void deleteFoodEntry(Long id) {
 
     }
