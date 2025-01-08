@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 public class UserDTO {
     private Long id;
+    private String firstName;
+    private String lastName;
     private String username;
     private String email;
     private Long roleId;
@@ -14,8 +16,10 @@ public class UserDTO {
     public UserDTO() {
     }
 
-    public UserDTO(Long id, String username, String email, Long roleId, String roleName) {
+    public UserDTO(Long id, String firstName, String lastName, String username, String email, Long roleId, String roleName) {
         this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.roleId = roleId;
@@ -28,6 +32,22 @@ public class UserDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getUsername() {
@@ -77,5 +97,6 @@ public class UserDTO {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 
 }

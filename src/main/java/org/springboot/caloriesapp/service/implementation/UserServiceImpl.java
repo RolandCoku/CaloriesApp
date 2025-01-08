@@ -29,21 +29,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO registerUser(RegisterUserDTO registerUserDTO) {
-        User user = new User();
-        user.setUsername(registerUserDTO.getUsername());
-        user.setEmail(registerUserDTO.getEmail());
 
         //Check if the password and password confirmation match
         if (!registerUserDTO.getPassword().equals(registerUserDTO.getConfirmPassword())) {
             throw new RuntimeException("Passwords do not match");
         }
 
-        user.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
+        //Check if the username already exists
+        if (userRepository.existsByUsername(registerUserDTO.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
 
-        Role role = roleRepository.findById(registerUserDTO.getRoleId())
+        //Check if the email already exists
+        if (userRepository.existsByEmail(registerUserDTO.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        //Find the role by ID
+        Role role = roleRepository.findById(2L)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
-        user.setRole(role);
 
+        User user = new User();
+        user.setName(registerUserDTO.getFirstName() + " " + registerUserDTO.getLastName());
+        user.setUsername(registerUserDTO.getUsername());
+        user.setEmail(registerUserDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
+        user.setRole(role);
         user = userRepository.save(user);
 
         return mapToDTO(user);
@@ -66,6 +77,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user = userRepository.save(user);
@@ -80,6 +92,8 @@ public class UserServiceImpl implements UserService {
     private UserDTO mapToDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
+        userDTO.setFirstName(user.getName().split(" ")[0]);
+        userDTO.setLastName(user.getName().split(" ")[1]);
         userDTO.setUsername(user.getUsername());
         userDTO.setEmail(user.getEmail());
         userDTO.setRoleId(user.getRole().getId());

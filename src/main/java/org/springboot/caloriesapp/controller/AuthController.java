@@ -1,28 +1,24 @@
 package org.springboot.caloriesapp.controller;
 
-import org.springboot.caloriesapp.dto.LoginDTO;
-import org.springboot.caloriesapp.service.AuthService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
-@RestController
+@Controller
 public class AuthController {
 
-    private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
+    @GetMapping("/login")
+    public String login() {
+        return "user/login";
     }
 
-    // Implement the login method here
-    @PostMapping("/api/login")
-    public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
-        return authService.login(loginDTO);
+    @GetMapping("/register")
+    public String register() {
+        return "user/register";
     }
 
+    @GetMapping("/home")
+    public String home() {
+        return "user/index";
+    }
     // Implement the logout method here
-
-
 }
