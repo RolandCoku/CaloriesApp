@@ -1,6 +1,8 @@
 package org.springboot.caloriesapp.service.implementation;
 
 import org.springboot.caloriesapp.dto.FoodEntryDTO;
+import org.springboot.caloriesapp.model.FoodEntry;
+import org.springboot.caloriesapp.repository.FoodEntryRepository;
 import org.springboot.caloriesapp.service.FoodEntryService;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +12,15 @@ import java.util.List;
 @Service
 public class FoodEntryServiceImpl implements FoodEntryService {
 
+    private final FoodEntryRepository foodEntryRepository;
+
+    public FoodEntryServiceImpl(FoodEntryRepository foodEntryRepository) {
+        this.foodEntryRepository = foodEntryRepository;
+    }
+
     @Override
     public FoodEntryDTO addFoodEntry(FoodEntryDTO foodEntryDTO) {
+        FoodEntry foodEntry = new FoodEntry();
         return null;
     }
 

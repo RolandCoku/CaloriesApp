@@ -6,9 +6,11 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +23,10 @@ public class User {
     private String username;
 
     @Column(nullable = false)
-    private String password;
+    private String email;
 
     @Column(nullable = false)
-    private String email;
+    private String password;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
@@ -36,6 +38,9 @@ public class User {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FoodEntry> foodEntries = List.of();
 
     public User() {
     }
@@ -112,4 +117,21 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+    public List<FoodEntry> getFoodEntries() {
+        return foodEntries;
+    }
+
+    public void setFoodEntries(List<FoodEntry> foodEntries) {
+        this.foodEntries = foodEntries;
+    }
+
+    public void addFoodEntry(FoodEntry foodEntry) {
+        this.foodEntries.add(foodEntry);
+        foodEntry.setUser(this);
+    }
+
+    public void removeFoodEntry(FoodEntry foodEntry) {
+        this.foodEntries.remove(foodEntry);
+        foodEntry.setUser(null);
+    }
 }
