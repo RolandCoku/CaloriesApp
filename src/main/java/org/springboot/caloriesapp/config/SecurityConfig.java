@@ -21,8 +21,20 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize ->
                         authorize
+                                .requestMatchers("/api/login", "/api/register").permitAll()
                                 .anyRequest().permitAll()
                 );
+        //TODO: Implement session authentication
+
+//                .formLogin(form -> form
+//                        .loginPage("/api/login")
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/api/logout")
+//                        .logoutSuccessUrl("/api/login?logout")
+//                        .permitAll()
+//                );
         return http.build();
     }
 
