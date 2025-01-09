@@ -8,6 +8,7 @@ import org.springboot.caloriesapp.service.FoodEntryService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -83,7 +84,7 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public List<FoodEntryDTO> getFoodEntriesByDate(LocalDate date) {
-        return List.of();
+        return foodEntryRepository.findAllByCreatedAtBetween(date.atStartOfDay(), date.atTime(LocalTime.MAX)).stream().map(this::mapToDTO).toList();
     }
 
     @Override
@@ -103,6 +104,8 @@ public class FoodEntryServiceImpl implements FoodEntryService {
         foodEntryDTO.setCalories(foodEntry.getCalories());
         foodEntryDTO.setPrice(foodEntry.getPrice());
         foodEntryDTO.setUserId(foodEntry.getUser().getId());
+        foodEntryDTO.setCreatedAt(foodEntry.getCreatedAt());
+        foodEntryDTO.setUpdatedAt(foodEntry.getUpdatedAt());
         return foodEntryDTO;
     }
 }
