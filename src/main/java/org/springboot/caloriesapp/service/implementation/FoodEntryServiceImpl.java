@@ -78,7 +78,7 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public FoodEntryDTO getFoodEntryById(Long id) {
-        return null;
+        return foodEntryRepository.findById(id).map(this::mapToDTO).orElseThrow(() -> new RuntimeException("Food entry not found"));
     }
 
     @Override
