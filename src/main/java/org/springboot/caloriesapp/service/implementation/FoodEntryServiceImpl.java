@@ -63,7 +63,7 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public void deleteFoodEntry(Long id) {
-
+        foodEntryRepository.deleteById(id);
     }
 
     @Override
