@@ -77,12 +77,21 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
+
+        if (userDTO.getFirstName() != null && userDTO.getLastName() != null) {
+            user.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
+        }
+        if (userDTO.getUsername() != null) {
+            user.setUsername(userDTO.getUsername());
+        }
+        if (userDTO.getEmail() != null) {
+            user.setEmail(userDTO.getEmail());
+        }
+
         user = userRepository.save(user);
         return mapToDTO(user);
     }
+
 
     @Override
     public void deleteUser(Long id) {

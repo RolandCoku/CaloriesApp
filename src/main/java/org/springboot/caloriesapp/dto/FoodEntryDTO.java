@@ -3,14 +3,14 @@ package org.springboot.caloriesapp.dto;
 public class FoodEntryDTO {
     private Long id;
     private String name;
-    private double calories;
-    private double price;
+    private Double calories;
+    private Double price;
     private Long userId;
 
     public FoodEntryDTO() {
     }
 
-    public FoodEntryDTO(Long id, String name, double calories, double price, Long userId) {
+    public FoodEntryDTO(Long id, String name, Double calories, Double price, Long userId) {
         this.id = id;
         this.name = name;
         this.calories = calories;
@@ -34,7 +34,7 @@ public class FoodEntryDTO {
         this.name = name;
     }
 
-    public double getCalories() {
+    public Double getCalories() {
         return calories;
     }
 
@@ -42,11 +42,11 @@ public class FoodEntryDTO {
         this.calories = calories;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

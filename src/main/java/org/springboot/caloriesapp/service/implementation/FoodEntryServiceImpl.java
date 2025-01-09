@@ -35,7 +35,25 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public FoodEntryDTO updateFoodEntry(Long id, FoodEntryDTO foodEntryDTO) {
-        return null;
+        FoodEntry foodEntry = foodEntryRepository.findById(id).orElseThrow(() -> new RuntimeException("Food entry not found"));
+
+        if (foodEntryDTO.getName() != null) {
+            foodEntry.setName(foodEntryDTO.getName());
+        }
+
+        if (foodEntryDTO.getCalories() != null) {
+            foodEntry.setCalories(foodEntryDTO.getCalories());
+        }
+
+        if (foodEntryDTO.getPrice() != null) {
+            foodEntry.setPrice(foodEntryDTO.getPrice());
+        }
+
+        if (foodEntryDTO.getUserId() != null) {
+            foodEntry.setUser(userRepository.findById(foodEntryDTO.getUserId()).orElseThrow());
+        }
+
+        return mapToDTO(foodEntryRepository.save(foodEntry));
     }
 
     @Override

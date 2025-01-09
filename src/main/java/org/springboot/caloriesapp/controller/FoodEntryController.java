@@ -34,13 +34,13 @@ public class FoodEntryController {
         return ResponseEntity.ok(foodEntryService.addFoodEntry(foodEntryDTO));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<FoodEntryDTO> updateFoodEntry(@RequestBody Long id,@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
+    @PutMapping("/{id}")
+    public ResponseEntity<FoodEntryDTO> updateFoodEntry(@PathVariable Long id,@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
         return ResponseEntity.ok(foodEntryService.updateFoodEntry(id, foodEntryDTO));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteFoodEntry(@RequestBody Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFoodEntry(@PathVariable Long id) {
         foodEntryService.deleteFoodEntry(id);
         return ResponseEntity.noContent().build();
     }
@@ -69,5 +69,6 @@ public class FoodEntryController {
     public ResponseEntity<List<FoodEntryDTO>> getFoodEntriesByUserIdAndDateRange(@PathVariable Long userId, @RequestParam String startDate, @RequestParam String endDate) {
         return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDateRange(userId, LocalDate.parse(startDate), LocalDate.parse(endDate)));
     }
+
 
 }

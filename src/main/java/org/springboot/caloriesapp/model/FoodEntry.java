@@ -13,8 +13,8 @@ public class FoodEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private double calories;
-    private double price;
+    private Double calories;
+    private Double price;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -31,7 +31,7 @@ public class FoodEntry {
     public FoodEntry() {
     }
 
-    public FoodEntry(Long id, String name, double calories, double price, User user) {
+    public FoodEntry(Long id, String name, Double calories, Double price, User user) {
         this.id = id;
         this.name = name;
         this.calories = calories;
@@ -55,19 +55,19 @@ public class FoodEntry {
         this.name = name;
     }
 
-    public double getCalories() {
+    public Double getCalories() {
         return calories;
     }
 
-    public void setCalories(double calories) {
+    public void setCalories(Double calories) {
         this.calories = calories;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
