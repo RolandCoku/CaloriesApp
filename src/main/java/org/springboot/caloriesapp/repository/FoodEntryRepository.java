@@ -16,4 +16,7 @@ public interface FoodEntryRepository extends JpaRepository<FoodEntry, Long> {
 
     @Query("SELECT f FROM FoodEntry f WHERE f.createdAt BETWEEN :startOfTheDay AND :endOfTheDay")
     public List<FoodEntry> findAllByCreatedAtBetween(LocalDateTime startOfTheDay, LocalDateTime endOfTheDay);
+
+    @Query("SELECT f FROM FoodEntry f WHERE f.user.id = :userId AND f.createdAt BETWEEN :startOfTheDay AND :endOfTheDay")
+    public List<FoodEntry> findAllByUserIdAndCreatedAtBetween(Long userId, LocalDateTime startOfTheDay, LocalDateTime endOfTheDay);
 }

@@ -67,6 +67,7 @@ public class UserController {
         }
     }
 
+    //TODO: Implement the following methods in the UserService and UserController classes
 //    // Search users by name
 //    @GetMapping("/search")
 //    public ResponseEntity<?> searchUsersByName(@RequestParam String name) {
