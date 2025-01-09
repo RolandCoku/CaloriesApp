@@ -73,7 +73,7 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public List<FoodEntryDTO> getFoodEntriesByUserId(Long userId) {
-        return List.of();
+        return foodEntryRepository.findAllByUserId(userId).stream().map(this::mapToDTO).toList();
     }
 
     @Override
