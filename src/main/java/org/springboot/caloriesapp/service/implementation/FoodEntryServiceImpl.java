@@ -94,7 +94,7 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public List<FoodEntryDTO> getFoodEntriesByUserIdAndDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
-        return List.of();
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)).stream().map(this::mapToDTO).toList();
     }
 
     private FoodEntryDTO mapToDTO(FoodEntry foodEntry) {
