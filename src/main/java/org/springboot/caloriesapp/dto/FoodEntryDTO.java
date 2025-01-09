@@ -2,19 +2,19 @@ package org.springboot.caloriesapp.dto;
 
 public class FoodEntryDTO {
     private Long id;
-    private String date;
-    private String time;
-    private int calories;
+    private String name;
+    private double calories;
+    private double price;
     private Long userId;
 
     public FoodEntryDTO() {
     }
 
-    public FoodEntryDTO(Long id, String date, String time, int calories, Long userId) {
+    public FoodEntryDTO(Long id, String name, double calories, double price, Long userId) {
         this.id = id;
-        this.date = date;
-        this.time = time;
+        this.name = name;
         this.calories = calories;
+        this.price = price;
         this.userId = userId;
     }
 
@@ -26,28 +26,28 @@ public class FoodEntryDTO {
         this.id = id;
     }
 
-    public String getDate() {
-        return date;
+    public String getName() {
+        return name;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public int getCalories() {
+    public double getCalories() {
         return calories;
     }
 
-    public void setCalories(int calories) {
+    public void setCalories(double calories) {
         this.calories = calories;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public Long getUserId() {

@@ -3,6 +3,7 @@ package org.springboot.caloriesapp.service.implementation;
 import org.springboot.caloriesapp.dto.FoodEntryDTO;
 import org.springboot.caloriesapp.model.FoodEntry;
 import org.springboot.caloriesapp.repository.FoodEntryRepository;
+import org.springboot.caloriesapp.repository.UserRepository;
 import org.springboot.caloriesapp.service.FoodEntryService;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +14,23 @@ import java.util.List;
 public class FoodEntryServiceImpl implements FoodEntryService {
 
     private final FoodEntryRepository foodEntryRepository;
+    private final UserRepository userRepository;
 
-    public FoodEntryServiceImpl(FoodEntryRepository foodEntryRepository) {
+    public FoodEntryServiceImpl(FoodEntryRepository foodEntryRepository, UserRepository userRepository) {
         this.foodEntryRepository = foodEntryRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public FoodEntryDTO addFoodEntry(FoodEntryDTO foodEntryDTO) {
         FoodEntry foodEntry = new FoodEntry();
-        return null;
+
+        foodEntry.setName(foodEntryDTO.getName());
+        foodEntry.setCalories(foodEntryDTO.getCalories());
+        foodEntry.setPrice(foodEntryDTO.getPrice());
+        foodEntry.setUser(userRepository.findById(foodEntryDTO.getUserId()).orElseThrow());
+
+        return mapToDTO(foodEntryRepository.save(foodEntry));
     }
 
     @Override
@@ -41,7 +50,7 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public List<FoodEntryDTO> getAllFoodEntries() {
-        return List.of();
+        return foodEntryRepository.findAll().stream().map(this::mapToDTO).toList();
     }
 
     @Override
@@ -67,5 +76,15 @@ public class FoodEntryServiceImpl implements FoodEntryService {
     @Override
     public List<FoodEntryDTO> getFoodEntriesByUserIdAndDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
         return List.of();
+    }
+
+    private FoodEntryDTO mapToDTO(FoodEntry foodEntry) {
+        FoodEntryDTO foodEntryDTO = new FoodEntryDTO();
+        foodEntryDTO.setId(foodEntry.getId());
+        foodEntryDTO.setName(foodEntry.getName());
+        foodEntryDTO.setCalories(foodEntry.getCalories());
+        foodEntryDTO.setPrice(foodEntry.getPrice());
+        foodEntryDTO.setUserId(foodEntry.getUser().getId());
+        return foodEntryDTO;
     }
 }

@@ -1,5 +1,6 @@
 package org.springboot.caloriesapp.controller;
 
+import jakarta.validation.Valid;
 import org.springboot.caloriesapp.dto.FoodEntryDTO;
 import org.springboot.caloriesapp.service.FoodEntryService;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +30,17 @@ public class FoodEntryController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<FoodEntryDTO> addFoodEntry(FoodEntryDTO foodEntryDTO) {
+    public ResponseEntity<FoodEntryDTO> addFoodEntry(@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
         return ResponseEntity.ok(foodEntryService.addFoodEntry(foodEntryDTO));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<FoodEntryDTO> updateFoodEntry(Long id, FoodEntryDTO foodEntryDTO) {
+    public ResponseEntity<FoodEntryDTO> updateFoodEntry(@RequestBody Long id,@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
         return ResponseEntity.ok(foodEntryService.updateFoodEntry(id, foodEntryDTO));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteFoodEntry(Long id) {
+    public ResponseEntity<Void> deleteFoodEntry(@RequestBody Long id) {
         foodEntryService.deleteFoodEntry(id);
         return ResponseEntity.noContent().build();
     }
