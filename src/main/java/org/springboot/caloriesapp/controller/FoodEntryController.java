@@ -27,17 +27,6 @@ public class FoodEntryController {
         return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
     }
 
-    // Get total calories for the food entries by USER ID
-    @GetMapping("/total-calories")
-    public ResponseEntity<?> getTotalCaloriesForUser(@RequestParam Long userId) {
-        try {
-            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUser(userId));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving total calories: " + e.getMessage());
-        }
-    }
-
-
     // Add a new food entry
     @PostMapping("/add")
     public ResponseEntity<?> addFoodEntry(@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
@@ -50,7 +39,9 @@ public class FoodEntryController {
 
     // Update an existing food entry
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateFoodEntry(@PathVariable Long id, @Valid @RequestBody FoodEntryDTO foodEntryDTO) {
+    public ResponseEntity<?> updateFoodEntry(
+            @PathVariable Long id,
+            @Valid @RequestBody FoodEntryDTO foodEntryDTO) {
         try {
             return ResponseEntity.ok(foodEntryService.updateFoodEntry(id, foodEntryDTO));
         } catch (RuntimeException e) {
@@ -90,8 +81,8 @@ public class FoodEntryController {
     }
 
     //Get all food entries by date
-    @GetMapping("/date")
-    public ResponseEntity<?> getFoodEntriesByDate(@RequestParam String date) {
+    @GetMapping("/date/{date}")
+    public ResponseEntity<?> getFoodEntriesByDate(@PathVariable String date) {
         try {
             LocalDate parsedDate = LocalDate.parse(date);
             return ResponseEntity.ok(foodEntryService.getFoodEntriesByDate(parsedDate));
@@ -104,7 +95,9 @@ public class FoodEntryController {
 
     // Get food entries by user ID and date
     @GetMapping("/user/{userId}/date/{date}")
-    public ResponseEntity<?> getFoodEntriesByUserIdAndDate(@PathVariable Long userId, @PathVariable String date) {
+    public ResponseEntity<?> getFoodEntriesByUserIdAndDate(
+            @PathVariable Long userId,
+            @PathVariable String date) {
         try {
             LocalDate parsedDate = LocalDate.parse(date);
             return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDate(userId, parsedDate));
@@ -135,6 +128,55 @@ public class FoodEntryController {
             return ResponseEntity.badRequest().body("Invalid date format. Please use YYYY-MM-DD.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving food entries: " + e.getMessage());
+        }
+    }
+
+    // Get total calories for the food entries by USER ID
+    @GetMapping("/user/{userId}/total-calories")
+    public ResponseEntity<?> getTotalCaloriesForUser(
+            @PathVariable Long userId) {
+        try {
+            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUser(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving total calories: " + e.getMessage());
+        }
+    }
+
+    // Get total calories for the food entries by USER ID and DATE
+    @GetMapping("/user/{userId}/total-calories/date/{date}")
+    public ResponseEntity<?> getTotalCaloriesForUserAndDate(
+            @PathVariable Long userId,
+            @PathVariable String date) {
+        try {
+            LocalDate parsedDate = LocalDate.parse(date);
+            return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDate(userId, parsedDate).stream().mapToDouble(FoodEntryDTO::getCalories).sum());
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Please use YYYY-MM-DD.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving total calories: " + e.getMessage());
+        }
+    }
+
+    // Get total calories for the food entries by USER ID and DATE RANGE
+    @GetMapping("/user/{userId}/total-calories/date-range")
+    public ResponseEntity<?> getTotalCaloriesForUserAndDateRange(
+            @PathVariable Long userId,
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+        try {
+            LocalDate parsedStartDate = LocalDate.parse(startDate);
+            LocalDate parsedEndDate = LocalDate.parse(endDate);
+
+            if (parsedStartDate.isAfter(parsedEndDate)) {
+                return ResponseEntity.badRequest().body("Start date must be before or equal to end date.");
+            }
+
+            return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDateRange(userId, parsedStartDate, parsedEndDate).stream().mapToDouble(FoodEntryDTO::getCalories).sum());
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Please use YYYY-MM-DD.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving total calories: " + e.getMessage());
         }
     }
 }
