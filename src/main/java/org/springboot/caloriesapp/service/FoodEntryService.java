@@ -10,7 +10,6 @@ import java.util.List;
 public interface FoodEntryService {
     FoodEntryDTO addFoodEntry(FoodEntryDTO foodEntryDTO);
     FoodEntryDTO updateFoodEntry(Long id, FoodEntryDTO foodEntryDTO);
-    Double getTotalCaloriesForUser(Long userId);
     void deleteFoodEntry(Long id);
     List<FoodEntryDTO> getAllFoodEntries();
     List<FoodEntryDTO> getFoodEntriesByUserId(Long userId);
@@ -18,4 +17,7 @@ public interface FoodEntryService {
     List<FoodEntryDTO> getFoodEntriesByDate(LocalDate date);
     List<FoodEntryDTO> getFoodEntriesByUserIdAndDate(Long userId, LocalDate date);
     List<FoodEntryDTO> getFoodEntriesByUserIdAndDateRange(Long userId, LocalDate startDate, LocalDate endDate);
+    Double getTotalCaloriesForUser(Long userId);
+    Double getTotalCaloriesForUserByDate(Long userId, LocalDate date);
+    Double getTotalCaloriesForUserByDateRange(Long userId, LocalDate startDate, LocalDate endDate);
 }

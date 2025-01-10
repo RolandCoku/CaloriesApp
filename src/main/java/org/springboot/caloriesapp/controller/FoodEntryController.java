@@ -144,12 +144,12 @@ public class FoodEntryController {
 
     // Get total calories for the food entries by USER ID and DATE
     @GetMapping("/user/{userId}/total-calories/date/{date}")
-    public ResponseEntity<?> getTotalCaloriesForUserAndDate(
+    public ResponseEntity<?> getTotalCaloriesForUserByDate(
             @PathVariable Long userId,
             @PathVariable String date) {
         try {
             LocalDate parsedDate = LocalDate.parse(date);
-            return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDate(userId, parsedDate).stream().mapToDouble(FoodEntryDTO::getCalories).sum());
+            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUserByDate(userId, parsedDate));
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().body("Invalid date format. Please use YYYY-MM-DD.");
         } catch (RuntimeException e) {
@@ -159,7 +159,7 @@ public class FoodEntryController {
 
     // Get total calories for the food entries by USER ID and DATE RANGE
     @GetMapping("/user/{userId}/total-calories/date-range")
-    public ResponseEntity<?> getTotalCaloriesForUserAndDateRange(
+    public ResponseEntity<?> getTotalCaloriesForUserByDateRange(
             @PathVariable Long userId,
             @RequestParam String startDate,
             @RequestParam String endDate
@@ -172,7 +172,7 @@ public class FoodEntryController {
                 return ResponseEntity.badRequest().body("Start date must be before or equal to end date.");
             }
 
-            return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDateRange(userId, parsedStartDate, parsedEndDate).stream().mapToDouble(FoodEntryDTO::getCalories).sum());
+            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUserByDateRange(userId, parsedStartDate, parsedEndDate));
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().body("Invalid date format. Please use YYYY-MM-DD.");
         } catch (RuntimeException e) {

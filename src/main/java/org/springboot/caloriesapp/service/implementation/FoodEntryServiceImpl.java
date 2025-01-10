@@ -58,11 +58,6 @@ public class FoodEntryServiceImpl implements FoodEntryService {
     }
 
     @Override
-    public Double getTotalCaloriesForUser(Long userId) {
-        return foodEntryRepository.findAllByUserId(userId).stream().mapToDouble(FoodEntry::getCalories).sum();
-    }
-
-    @Override
     public void deleteFoodEntry(Long id) {
         foodEntryRepository.deleteById(id);
     }
@@ -95,6 +90,21 @@ public class FoodEntryServiceImpl implements FoodEntryService {
     @Override
     public List<FoodEntryDTO> getFoodEntriesByUserIdAndDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
         return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)).stream().map(this::mapToDTO).toList();
+    }
+
+    @Override
+    public Double getTotalCaloriesForUser(Long userId) {
+        return foodEntryRepository.findAllByUserId(userId).stream().mapToDouble(FoodEntry::getCalories).sum();
+    }
+
+    @Override
+    public Double getTotalCaloriesForUserByDate(Long userId, LocalDate date) {
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, date.atStartOfDay(), date.atTime(LocalTime.MAX)).stream().mapToDouble(FoodEntry::getCalories).sum();
+    }
+
+    @Override
+    public Double getTotalCaloriesForUserByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)).stream().mapToDouble(FoodEntry::getCalories).sum();
     }
 
     private FoodEntryDTO mapToDTO(FoodEntry foodEntry) {
