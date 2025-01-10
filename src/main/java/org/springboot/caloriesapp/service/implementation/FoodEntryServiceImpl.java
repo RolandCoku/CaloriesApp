@@ -58,8 +58,8 @@ public class FoodEntryServiceImpl implements FoodEntryService {
     }
 
     @Override
-    public int getTotalCalories() {
-        return 0;
+    public Double getTotalCaloriesForUser(Long userId) {
+        return foodEntryRepository.findAllByUserId(userId).stream().mapToDouble(FoodEntry::getCalories).sum();
     }
 
     @Override

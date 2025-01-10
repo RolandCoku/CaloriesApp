@@ -10,7 +10,7 @@ import java.util.List;
 public interface FoodEntryService {
     FoodEntryDTO addFoodEntry(FoodEntryDTO foodEntryDTO);
     FoodEntryDTO updateFoodEntry(Long id, FoodEntryDTO foodEntryDTO);
-    int getTotalCalories();
+    Double getTotalCaloriesForUser(Long userId);
     void deleteFoodEntry(Long id);
     List<FoodEntryDTO> getAllFoodEntries();
     List<FoodEntryDTO> getFoodEntriesByUserId(Long userId);

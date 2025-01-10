@@ -27,11 +27,16 @@ public class FoodEntryController {
         return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
     }
 
-    // Get total calories of all food entries
+    // Get total calories for the food entries by USER ID
     @GetMapping("/total-calories")
-    public ResponseEntity<Integer> getTotalCalories() {
-        return ResponseEntity.ok(foodEntryService.getTotalCalories());
+    public ResponseEntity<?> getTotalCaloriesForUser(@RequestParam Long userId) {
+        try {
+            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUser(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving total calories: " + e.getMessage());
+        }
     }
+
 
     // Add a new food entry
     @PostMapping("/add")
