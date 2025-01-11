@@ -37,7 +37,10 @@ public class Role {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        this.name = name.toUpperCase();
     }
 
 }

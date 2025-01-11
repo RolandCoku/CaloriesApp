@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
         }
 
         //Find the role by ID
-        Role role = roleRepository.findById(2L)
+        Role role = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         User user = new User();
@@ -80,7 +81,14 @@ public class UserServiceImpl implements UserService {
 
         if (userDTO.getFirstName() != null && userDTO.getLastName() != null) {
             user.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
+
+        } else if (userDTO.getFirstName() != null && userDTO.getLastName() == null) {
+            user.setName(userDTO.getFirstName() + " " + user.getName().split(" ")[1]);
+
+        }else if (userDTO.getLastName() != null && userDTO.getFirstName() == null) {
+            user.setName(user.getName().split(" ")[0] + " " + userDTO.getLastName());
         }
+
         if (userDTO.getUsername() != null) {
             user.setUsername(userDTO.getUsername());
         }
@@ -92,9 +100,12 @@ public class UserServiceImpl implements UserService {
         return mapToDTO(user);
     }
 
-
     @Override
     public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
+
         userRepository.deleteById(id);
     }
 
