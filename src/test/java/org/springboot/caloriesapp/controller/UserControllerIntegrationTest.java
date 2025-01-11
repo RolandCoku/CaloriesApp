@@ -73,4 +73,65 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.username").value("testUsername"))
                 .andExpect(jsonPath("$.email").value("test@example.com"));
     }
+
+    @Test
+    void registerUser_UsernameExists_ReturnsBadRequest() throws Exception {
+        // given
+        User user = new User("testName testSurname", "testUsername", "password", "test@example.com", userRole);
+        userRepository.save(user);
+
+        RegisterUserDTO registerUserDTO = new RegisterUserDTO();
+        registerUserDTO.setFirstName("testName");
+        registerUserDTO.setLastName("testSurname");
+        registerUserDTO.setUsername("testUsername");
+        registerUserDTO.setEmail("test@example.com");
+        registerUserDTO.setPassword("password");
+        registerUserDTO.setConfirmPassword("password");
+
+        // when & then
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerUserDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void registerUser_EmailExists_ReturnsBadRequest() throws Exception {
+        // given
+        User user = new User("testName testSurname", "testUsername", "password", "test@example.com", userRole);
+        userRepository.save(user);
+
+        RegisterUserDTO registerUserDTO = new RegisterUserDTO();
+        registerUserDTO.setFirstName("testName");
+        registerUserDTO.setLastName("testSurname");
+        registerUserDTO.setUsername("newTestUsername");
+        registerUserDTO.setEmail("test@example.com");
+        registerUserDTO.setPassword("password");
+        registerUserDTO.setConfirmPassword("password");
+
+        // when & then
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerUserDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void registerUser_PasswordMismatch_ReturnsBadRequest() throws Exception {
+        // given
+        RegisterUserDTO registerUserDTO = new RegisterUserDTO();
+        registerUserDTO.setFirstName("testName");
+        registerUserDTO.setLastName("testSurname");
+        registerUserDTO.setUsername("testUsername");
+        registerUserDTO.setEmail("test@example.com");
+        registerUserDTO.setPassword("password1");
+        registerUserDTO.setConfirmPassword("password2");
+
+        // when & then
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerUserDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
 }
