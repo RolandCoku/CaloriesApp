@@ -26,7 +26,7 @@ public class AdminController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
@@ -37,13 +37,13 @@ public class AdminController {
     }
 
     //Manage food entries endpoints
-    @GetMapping
+    @GetMapping("/food-entries")
     public ResponseEntity<List<FoodEntryDTO>> getAllFoodEntries() {
         return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
     }
 
     //Get food entry by id
-    @GetMapping("/food-entry/{id}")
+    @GetMapping("/food-entries/{id}")
     public ResponseEntity<?> getFoodEntryById(@PathVariable Long id){
         try {
             return ResponseEntity.ok(foodEntryService.getFoodEntryById(id));
@@ -53,7 +53,7 @@ public class AdminController {
     }
 
     // Add a new food entry
-    @PostMapping("/food-entry/create")
+    @PostMapping("/food-entries/create")
     public ResponseEntity<?> createFoodEntry(@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
         try {
             return ResponseEntity.ok(foodEntryService.addFoodEntry(foodEntryDTO));
@@ -75,7 +75,7 @@ public class AdminController {
     }
 
     // Delete a food entry
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/food-entries/{id}")
     public ResponseEntity<?> deleteFoodEntry(@PathVariable Long id) {
         try {
             foodEntryService.deleteFoodEntry(id);

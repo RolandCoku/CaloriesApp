@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> getAllUserWhoExceededMonthlyPriceLimit(){
         double monthlyLimit = 1000.0;
-        return userRepository.findUsersExceedingMonthlyLimit(monthlyLimit).stream().map(this::mapToDTO).toList();
+        return userRepository.findUsersExceedingMonthlyLimit(monthlyLimit).stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     private UserDTO mapToDTO(User user) {

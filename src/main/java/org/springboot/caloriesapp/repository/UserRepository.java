@@ -23,12 +23,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.email = :email")
     boolean existsByEmail(String email);
 
-    @Query("SELECT u FROM User u " +
-            "JOIN u.entries e " +
-            "WHERE e.date >= FUNCTION('DATE_FORMAT', CURRENT_DATE - INTERVAL 1 MONTH, '%Y-%m-01') " +
-            "AND e.date < FUNCTION('DATE_FORMAT', CURRENT_DATE, '%Y-%m-01') " +
+    @Query(value = "SELECT u.* " +
+            "FROM users u " +
+            "JOIN food_entries f ON u.id = f.user_id " +
+            "WHERE f.created_at >= DATE_FORMAT(CURRENT_DATE - INTERVAL 1 MONTH, '%Y-%m-01') " +
+            "AND f.created_at <= CURRENT_TIMESTAMP " +
             "GROUP BY u.id " +
-            "HAVING SUM(e.price) > :priceLimit")
+            "HAVING SUM(f.price) > :priceLimit", nativeQuery = true)
 
     List<User> findUsersExceedingMonthlyLimit(@Param("priceLimit") double priceLimit);
+
 }
