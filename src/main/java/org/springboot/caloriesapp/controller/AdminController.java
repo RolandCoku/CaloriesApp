@@ -84,8 +84,9 @@ public class AdminController {
         }
     }
 
+    //Get all users that exceeded the monthly spending limit
     @GetMapping("/users/above-price-limit")
     public ResponseEntity<?> getAllUserWhoExceededMonthlyPriceLimit(){
-        return ResponseEntity.ok(foodEntryService.getAllUserWhoExceededMonthlyPriceLimit());
+        return ResponseEntity.ok(userService.getAllUserWhoExceededMonthlyPriceLimit());
     }
 }

@@ -109,6 +109,12 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
+    @Override
+    public List<UserDTO> getAllUserWhoExceededMonthlyPriceLimit(){
+        double monthlyLimit = 1000.0;
+        return userRepository.findUsersExceedingMonthlyLimit(monthlyLimit).stream().map(this::mapToDTO).toList();
+    }
+
     private UserDTO mapToDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
