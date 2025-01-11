@@ -20,4 +20,5 @@ public interface FoodEntryService {
     Double getTotalCaloriesForUser(Long userId);
     Double getTotalCaloriesForUserByDate(Long userId, LocalDate date);
     Double getTotalCaloriesForUserByDateRange(Long userId, LocalDate startDate, LocalDate endDate);
+    Double getWeaklyAverageCaloriesByUser(Long id);
 }

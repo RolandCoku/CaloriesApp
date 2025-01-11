@@ -8,6 +8,7 @@ import org.springboot.caloriesapp.service.FoodEntryService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -105,6 +106,14 @@ public class FoodEntryServiceImpl implements FoodEntryService {
     @Override
     public Double getTotalCaloriesForUserByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
         return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)).stream().mapToDouble(FoodEntry::getCalories).sum();
+    }
+
+    @Override
+    public Double getWeaklyAverageCaloriesByUser(Long id){
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(id, LocalDateTime.now().minusDays(7), LocalDateTime.now());
+        double totalCalories = foodEntriesOnTheLastWeek.stream().mapToDouble(FoodEntry::getCalories).sum();
+
+        return totalCalories/foodEntriesOnTheLastWeek.size();
     }
 
     private FoodEntryDTO mapToDTO(FoodEntry foodEntry) {
