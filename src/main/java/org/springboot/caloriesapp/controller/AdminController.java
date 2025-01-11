@@ -42,9 +42,19 @@ public class AdminController {
         return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
     }
 
+    //Get food entry by id
+    @GetMapping("/food-entry/{id}")
+    public ResponseEntity<?> getFoodEntryById(@PathVariable Long id){
+        try {
+            return ResponseEntity.ok(foodEntryService.getFoodEntryById(id));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     // Add a new food entry
-    @PostMapping("/add")
-    public ResponseEntity<?> addFoodEntry(@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
+    @PostMapping("/food-entry/create")
+    public ResponseEntity<?> createFoodEntry(@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
         try {
             return ResponseEntity.ok(foodEntryService.addFoodEntry(foodEntryDTO));
         } catch (RuntimeException e) {
