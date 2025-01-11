@@ -134,4 +134,105 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void getUserById_Successful() throws Exception {
+        // given
+        User user = new User("testName testSurname", "testUsername", "password", "test@example.com", userRole);
+        user = userRepository.save(user);
+
+        // when & then
+        mockMvc.perform(get("/users/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("testUsername"))
+                .andExpect(jsonPath("$.email").value("test@example.com"));
+    }
+
+    @Test
+    void getUserById_NotFound() throws Exception {
+        mockMvc.perform(get("/users/9999"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(containsString("User not found")));
+    }
+
+    @Test
+    void getAllUsers_Successful() throws Exception {
+        // given
+        User user1 = new User("testName1 testSurname1", "testUsername1", "password", "test1@example.com", userRole);
+        User user2 = new User("testName2 testSurname2", "testUsername2", "password", "test2@example.com", userRole);
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        // when & then
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].username").value("testUsername1"))
+                .andExpect(jsonPath("$[0].email").value("test1@example.com"))
+                .andExpect(jsonPath("$[1].username").value("testUsername2"))
+                .andExpect(jsonPath("$[1].email").value("test2@example.com"));
+    }
+
+    @Test
+    void getAllUsers_EmptyList() throws Exception {
+        // when & then
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+    }
+
+    @Test
+    void updateUser_Successful() throws Exception {
+        // given
+        User user = new User("newTestName newTestSurname", "newTestUsername", "password", "newTest@example.com", userRole);
+        user = userRepository.save(user);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFirstName("newTestName");
+        userDTO.setLastName("newTestSurname");
+        userDTO.setUsername("newTestUsername");
+        userDTO.setEmail("newTest@example.com");
+
+        // when & then
+        mockMvc.perform(put("/users/" + user.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("newTestUsername"))
+                .andExpect(jsonPath("$.email").value("newTest@example.com"));
+    }
+
+    @Test
+    void updateUser_NotFound() throws Exception {
+        // given
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFirstName("newTestName");
+        userDTO.setLastName("newTestSurname");
+        userDTO.setUsername("newTestUsername");
+        userDTO.setEmail("newTest@example.com");
+
+        // when & then
+        mockMvc.perform(put("/users/9999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteUser_Successful() throws Exception {
+        // given
+        User user = new User("testName testSurname", "testUsername", "password", "test@example.com", userRole);
+        user = userRepository.save(user);
+
+        // when & then
+        mockMvc.perform(delete("/users/" + user.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteUser_NotFound() throws Exception {
+        mockMvc.perform(delete("/users/9999"))
+                .andExpect(status().isNotFound());
+    }
+
+
 }
