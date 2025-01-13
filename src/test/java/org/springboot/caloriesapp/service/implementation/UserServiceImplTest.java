@@ -106,6 +106,31 @@ class UserServiceImplTest {
         assertTrue(ex.getMessage().contains("Email already exists"));
     }
 
+    @Test
+    void getUserById_Successful() {
+        // given
+        User user = new User("TestName TestSurname", "testUser", "password", "test@example.com", new Role(2L, "USER"));
+        user.setId(1L);
 
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // when
+        UserDTO result = userService.getUserById(1L);
+
+        // then
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("testUser", result.getUsername());
+    }
+
+    @Test
+    void getUserById_NotFound_ThrowsException() {
+        // given
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // when & then
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.getUserById(99L));
+        assertTrue(ex.getMessage().contains("User not found"));
+    }
 
 }
