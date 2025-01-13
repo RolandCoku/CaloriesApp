@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Create Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7fa;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Create an Account</h2>
+    <form id="registrationForm">
+        <input type="text" id="name" placeholder="First Name" required>
+        <input type="text" id="surname" placeholder="Last Name" required>
+        <input type="email" id="email" placeholder="Email Address" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="password" id="confirm_password" placeholder="Confirm Password" required>
+        <button type="submit">Register</button>
+    </form>
+    <div class="message" id="responseMessage"></div>
+</div>
+
+<script>
+    document.getElementById("registrationForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Get values from the form fields
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        // Basic validation (you can expand it as needed)
+        if (name === "" || email === "" || password === "") {
+            document.getElementById("responseMessage").textContent = "Please fill in all fields!";
+            document.getElementById("responseMessage").style.color = "red";
+            return;
+        }
+
+        // Simulate form submission success
+        // In a real-world scenario, here you'd send the data to your back-end server
+        document.getElementById("responseMessage").textContent = `Account created for ${name}!`;
+        document.getElementById("responseMessage").style.color = "green";
+
+        // Reset the form
+        document.getElementById("registrationForm").reset();
+    });
+</script>
+
+</body>
+</html>
