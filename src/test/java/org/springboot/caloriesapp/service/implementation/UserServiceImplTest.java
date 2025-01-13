@@ -71,4 +71,41 @@ class UserServiceImplTest {
         assertEquals(2L, result.getRoleId());
         verify(userRepository, times(1)).save(any(User.class));
     }
+
+    @Test
+    void registerUser_PasswordsMismatch_ThrowsException() {
+        // given
+        registerUserDTO.setPassword("abc123");
+        registerUserDTO.setConfirmPassword("def456");
+
+        // when & then
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.registerUser(registerUserDTO));
+        assertTrue(ex.getMessage().contains("Passwords do not match"));
+    }
+
+    @Test
+    void registerUser_UsernameAlreadyExists_ThrowsException() {
+        // given
+        registerUserDTO.setPassword("password");
+        when(userRepository.existsByUsername("testUser")).thenReturn(true);
+
+        // when & then
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.registerUser(registerUserDTO));
+        assertTrue(ex.getMessage().contains("Username already exists"));
+    }
+
+    @Test
+    void registerUser_EmailAlreadyExists_ThrowsException() {
+        // given
+        registerUserDTO.setPassword("password");
+        when(userRepository.existsByUsername("testUser")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
+
+        // when & then
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.registerUser(registerUserDTO));
+        assertTrue(ex.getMessage().contains("Email already exists"));
+    }
+
+
+
 }
