@@ -1,14 +1,12 @@
 package org.springboot.caloriesapp.controller;
 
 import jakarta.validation.Valid;
-import org.springboot.caloriesapp.dto.FoodEntryDTO;
+import org.springboot.caloriesapp.dto.FoodEntryAdminDTO;
 import org.springboot.caloriesapp.service.FoodEntryService;
 import org.springboot.caloriesapp.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -38,8 +36,12 @@ public class AdminController {
 
     //Manage food entries endpoints
     @GetMapping("/food-entries")
-    public ResponseEntity<List<FoodEntryDTO>> getAllFoodEntries() {
-        return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
+    public ResponseEntity<?> getAllFoodEntries() {
+        try {
+            return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     //Get food entry by id
@@ -54,9 +56,9 @@ public class AdminController {
 
     // Add a new food entry
     @PostMapping("/food-entries/create")
-    public ResponseEntity<?> createFoodEntry(@Valid @RequestBody FoodEntryDTO foodEntryDTO) {
+    public ResponseEntity<?> createFoodEntry(@Valid @RequestBody FoodEntryAdminDTO foodEntryAdminDTO) {
         try {
-            return ResponseEntity.ok(foodEntryService.addFoodEntry(foodEntryDTO));
+            return ResponseEntity.ok(foodEntryService.addFoodEntryForUser(foodEntryAdminDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Error adding food entry: " + e.getMessage());
         }
@@ -66,9 +68,9 @@ public class AdminController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFoodEntry(
             @PathVariable Long id,
-            @Valid @RequestBody FoodEntryDTO foodEntryDTO) {
+            @Valid @RequestBody FoodEntryAdminDTO foodEntryAdminDTO) {
         try {
-            return ResponseEntity.ok(foodEntryService.updateFoodEntry(id, foodEntryDTO));
+            return ResponseEntity.ok(foodEntryService.updateFoodEntryById(id, foodEntryAdminDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error updating food entry: " + e.getMessage());
         }
@@ -78,7 +80,7 @@ public class AdminController {
     @DeleteMapping("/food-entries/{id}")
     public ResponseEntity<?> deleteFoodEntry(@PathVariable Long id) {
         try {
-            foodEntryService.deleteFoodEntry(id);
+            foodEntryService.deleteFoodEntryById(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error deleting food entry: " + e.getMessage());
