@@ -16,7 +16,7 @@ public class FoodEntryAdminDTO extends FoodEntryDTO {
     }
 
     public void setUserId(Long userId) {
-        this.userId = userId;
+        this.userId =userId;
     }
 }
 

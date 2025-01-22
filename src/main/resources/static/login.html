@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+<div class="container">
+    <div class="login-box">
+        <div class="logo">
+            <img src="/images/logo.png" alt="Calorie Tracker Logo" />
+        </div>
+        <h1>Welcome Back!</h1>
+        <p class="subtitle">Track your calories and stay on top of your goals.</p>
+        <form id="loginForm" th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            <div id="error-message" class="error-message"></div> <!-- Error message container -->
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="footer">
+            <p>Don't have an account? <a href="/register">Sign up</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this);
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            // Redirect on success
+            // window.location.href = '/dashboard'; // Change to your redirect URL
+            console.log('Login successful!'); // For testing
+            console.log(response)
+        } else {
+            // Display error message on failure
+            const errorMessage = await response.text();
+            document.getElementById('error-message').innerText = errorMessage || 'Login failed. Please try again.';
+        }
+    });
+</script>
+</body>
+</html>

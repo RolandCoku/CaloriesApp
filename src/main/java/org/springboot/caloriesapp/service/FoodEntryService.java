@@ -30,4 +30,3 @@ public interface FoodEntryService {
     void deleteFoodEntryById(Long id); // Delete entry by ID without filtering
     FoodEntryAdminDTO updateFoodEntryById(Long id, FoodEntryDTO foodEntryDTO);
 }
-
