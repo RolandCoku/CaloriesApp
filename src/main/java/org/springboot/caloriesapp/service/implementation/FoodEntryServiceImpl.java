@@ -1,5 +1,6 @@
 package org.springboot.caloriesapp.service.implementation;
 
+import org.springboot.caloriesapp.dto.FoodEntryAdminDTO;
 import org.springboot.caloriesapp.dto.FoodEntryDTO;
 import org.springboot.caloriesapp.model.FoodEntry;
 import org.springboot.caloriesapp.repository.FoodEntryRepository;
@@ -23,108 +24,214 @@ public class FoodEntryServiceImpl implements FoodEntryService {
         this.userRepository = userRepository;
     }
 
-    @Override
-    public FoodEntryDTO addFoodEntry(FoodEntryDTO foodEntryDTO) {
-        FoodEntry foodEntry = new FoodEntry();
+    // ----------------------- User-Specific Methods -----------------------
 
+    @Override
+    public FoodEntryDTO addFoodEntry(Long userId, FoodEntryDTO foodEntryDTO) {
+        FoodEntry foodEntry = new FoodEntry();
         foodEntry.setName(foodEntryDTO.getName());
         foodEntry.setCalories(foodEntryDTO.getCalories());
         foodEntry.setPrice(foodEntryDTO.getPrice());
-        foodEntry.setUser(userRepository.findById(foodEntryDTO.getUserId()).orElseThrow());
+        foodEntry.setUser(userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found")));
+        foodEntry.setCreatedAt(LocalDateTime.now());
+        foodEntry.setUpdatedAt(LocalDateTime.now());
 
-        return mapToDTO(foodEntryRepository.save(foodEntry));
+        return mapToFoodEntryDTO(foodEntryRepository.save(foodEntry));
     }
 
     @Override
-    public FoodEntryDTO updateFoodEntry(Long id, FoodEntryDTO foodEntryDTO) {
-        FoodEntry foodEntry = foodEntryRepository.findById(id).orElseThrow(() -> new RuntimeException("Food entry not found"));
+    public FoodEntryDTO updateFoodEntry(Long userId, Long id, FoodEntryDTO foodEntryDTO) {
+        FoodEntry foodEntry = foodEntryRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new RuntimeException("Food entry not found or access denied"));
 
         if (foodEntryDTO.getName() != null) {
             foodEntry.setName(foodEntryDTO.getName());
         }
-
         if (foodEntryDTO.getCalories() != null) {
             foodEntry.setCalories(foodEntryDTO.getCalories());
         }
-
         if (foodEntryDTO.getPrice() != null) {
             foodEntry.setPrice(foodEntryDTO.getPrice());
         }
+        foodEntry.setUpdatedAt(LocalDateTime.now());
 
-        if (foodEntryDTO.getUserId() != null) {
-            foodEntry.setUser(userRepository.findById(foodEntryDTO.getUserId()).orElseThrow());
-        }
-
-        return mapToDTO(foodEntryRepository.save(foodEntry));
+        return mapToFoodEntryDTO(foodEntryRepository.save(foodEntry));
     }
 
     @Override
-    public void deleteFoodEntry(Long id) {
-        foodEntryRepository.deleteById(id);
-    }
+    public void deleteFoodEntry(Long userId, Long id) {
+        FoodEntry foodEntry = foodEntryRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new RuntimeException("Food entry not found or access denied"));
 
-    @Override
-    public List<FoodEntryDTO> getAllFoodEntries() {
-        return foodEntryRepository.findAll().stream().map(this::mapToDTO).toList();
+        foodEntryRepository.delete(foodEntry);
     }
 
     @Override
     public List<FoodEntryDTO> getFoodEntriesByUserId(Long userId) {
-        return foodEntryRepository.findAllByUserId(userId).stream().map(this::mapToDTO).toList();
+        return foodEntryRepository.findAllByUserId(userId)
+                .stream()
+                .map(this::mapToFoodEntryDTO)
+                .toList();
     }
 
     @Override
-    public FoodEntryDTO getFoodEntryById(Long id) {
-        return foodEntryRepository.findById(id).map(this::mapToDTO).orElseThrow(() -> new RuntimeException("Food entry not found"));
-    }
-
-    @Override
-    public List<FoodEntryDTO> getFoodEntriesByDate(LocalDate date) {
-        return foodEntryRepository.findAllByCreatedAtBetween(date.atStartOfDay(), date.atTime(LocalTime.MAX)).stream().map(this::mapToDTO).toList();
+    public FoodEntryDTO getFoodEntryById(Long userId, Long id) {
+        return foodEntryRepository.findByIdAndUserId(id, userId)
+                .map(this::mapToFoodEntryDTO)
+                .orElseThrow(() -> new RuntimeException("Food entry not found or access denied"));
     }
 
     @Override
     public List<FoodEntryDTO> getFoodEntriesByUserIdAndDate(Long userId, LocalDate date) {
-        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, date.atStartOfDay(), date.atTime(LocalTime.MAX)).stream().map(this::mapToDTO).toList();
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                        userId,
+                        date.atStartOfDay(),
+                        date.atTime(LocalTime.MAX))
+                .stream()
+                .map(this::mapToFoodEntryDTO)
+                .toList();
     }
 
     @Override
     public List<FoodEntryDTO> getFoodEntriesByUserIdAndDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
-        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)).stream().map(this::mapToDTO).toList();
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                        userId,
+                        startDate.atStartOfDay(),
+                        endDate.atTime(LocalTime.MAX))
+                .stream()
+                .map(this::mapToFoodEntryDTO)
+                .toList();
     }
 
     @Override
     public Double getTotalCaloriesForUser(Long userId) {
-        return foodEntryRepository.findAllByUserId(userId).stream().mapToDouble(FoodEntry::getCalories).sum();
+        return foodEntryRepository.findAllByUserId(userId)
+                .stream()
+                .mapToDouble(FoodEntry::getCalories)
+                .sum();
     }
 
     @Override
     public Double getTotalCaloriesForUserByDate(Long userId, LocalDate date) {
-        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, date.atStartOfDay(), date.atTime(LocalTime.MAX)).stream().mapToDouble(FoodEntry::getCalories).sum();
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                        userId,
+                        date.atStartOfDay(),
+                        date.atTime(LocalTime.MAX))
+                .stream()
+                .mapToDouble(FoodEntry::getCalories)
+                .sum();
     }
 
     @Override
     public Double getTotalCaloriesForUserByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
-        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)).stream().mapToDouble(FoodEntry::getCalories).sum();
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                        userId,
+                        startDate.atStartOfDay(),
+                        endDate.atTime(LocalTime.MAX))
+                .stream()
+                .mapToDouble(FoodEntry::getCalories)
+                .sum();
     }
 
     @Override
-    public Double getWeaklyAverageCaloriesByUser(Long id){
-        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(id, LocalDateTime.now().minusDays(7), LocalDateTime.now());
-        double totalCalories = foodEntriesOnTheLastWeek.stream().mapToDouble(FoodEntry::getCalories).sum();
+    public Double getWeaklyAverageCaloriesByUser(Long userId) {
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                userId,
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now());
+        double totalCalories = foodEntriesOnTheLastWeek.stream()
+                .mapToDouble(FoodEntry::getCalories)
+                .sum();
 
-        return totalCalories/foodEntriesOnTheLastWeek.size();
+        return totalCalories / (foodEntriesOnTheLastWeek.isEmpty() ? 1 : foodEntriesOnTheLastWeek.size());
     }
 
-    private FoodEntryDTO mapToDTO(FoodEntry foodEntry) {
+    // ----------------------- Admin-Specific Methods -----------------------
+
+    @Override
+    public List<FoodEntryAdminDTO> getAllFoodEntries() {
+        return foodEntryRepository.findAll()
+                .stream()
+                .map(this::mapToFoodEntryAdminDTO)
+                .toList();
+    }
+
+    @Override
+    public FoodEntryAdminDTO getFoodEntryById(Long id) {
+        return foodEntryRepository.findById(id)
+                .map(this::mapToFoodEntryAdminDTO)
+                .orElseThrow(() -> new RuntimeException("Food entry not found"));
+    }
+
+    @Override
+    public FoodEntryAdminDTO addFoodEntryForUser(FoodEntryAdminDTO foodEntryAdminDTO) {
+        FoodEntry foodEntry = new FoodEntry();
+        foodEntry.setName(foodEntryAdminDTO.getName());
+        foodEntry.setCalories(foodEntryAdminDTO.getCalories());
+        foodEntry.setPrice(foodEntryAdminDTO.getPrice());
+        foodEntry.setUser(userRepository.findById(foodEntryAdminDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
+        foodEntry.setCreatedAt(LocalDateTime.now());
+        foodEntry.setUpdatedAt(LocalDateTime.now());
+
+        return mapToFoodEntryAdminDTO(foodEntryRepository.save(foodEntry));
+    }
+
+    @Override
+    public void deleteFoodEntryById(Long id) {
+        FoodEntry foodEntry = foodEntryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Food entry not found"));
+        foodEntryRepository.delete(foodEntry);
+    }
+
+    @Override
+    public FoodEntryAdminDTO updateFoodEntryById(Long id, FoodEntryDTO foodEntryDTO) {
+        FoodEntry foodEntry = foodEntryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Food entry not found"));
+
+        if (foodEntryDTO.getName() != null) {
+            foodEntry.setName(foodEntryDTO.getName());
+        }
+        if (foodEntryDTO.getCalories() != null) {
+            foodEntry.setCalories(foodEntryDTO.getCalories());
+        }
+        if (foodEntryDTO.getPrice() != null) {
+            foodEntry.setPrice(foodEntryDTO.getPrice());
+        }
+        foodEntry.setUpdatedAt(LocalDateTime.now());
+
+        return mapToFoodEntryAdminDTO(foodEntryRepository.save(foodEntry));
+    }
+
+    // ----------------------- Utility Method -----------------------
+
+    private FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry) {
         FoodEntryDTO foodEntryDTO = new FoodEntryDTO();
         foodEntryDTO.setId(foodEntry.getId());
         foodEntryDTO.setName(foodEntry.getName());
         foodEntryDTO.setCalories(foodEntry.getCalories());
         foodEntryDTO.setPrice(foodEntry.getPrice());
-        foodEntryDTO.setUserId(foodEntry.getUser().getId());
         foodEntryDTO.setCreatedAt(foodEntry.getCreatedAt());
         foodEntryDTO.setUpdatedAt(foodEntry.getUpdatedAt());
         return foodEntryDTO;
     }
+
+    private FoodEntryAdminDTO mapToFoodEntryAdminDTO(FoodEntry foodEntry) {
+        FoodEntryAdminDTO foodEntryAdminDTO = new FoodEntryAdminDTO();
+        foodEntryAdminDTO.setId(foodEntry.getId());
+        foodEntryAdminDTO.setName(foodEntry.getName());
+        foodEntryAdminDTO.setCalories(foodEntry.getCalories());
+        foodEntryAdminDTO.setPrice(foodEntry.getPrice());
+        foodEntryAdminDTO.setCreatedAt(foodEntry.getCreatedAt());
+        foodEntryAdminDTO.setUpdatedAt(foodEntry.getUpdatedAt());
+        if (foodEntry.getUser() != null) {
+            foodEntryAdminDTO.setUserId(foodEntry.getUser().getId());
+        }
+        return foodEntryAdminDTO;
+    }
 }
+
+
+
+

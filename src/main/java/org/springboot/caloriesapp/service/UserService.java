@@ -2,6 +2,7 @@ package org.springboot.caloriesapp.service;
 
 import org.springboot.caloriesapp.dto.RegisterUserDTO;
 import org.springboot.caloriesapp.dto.UserDTO;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,4 +15,7 @@ public interface UserService {
     UserDTO updateUser(Long id, UserDTO userDTO);
     void deleteUser(Long id);
     List<UserDTO> getAllUserWhoExceededMonthlyPriceLimit();
+    Long getUserIdByUsername(String username);
+
+    boolean isAdmin(Authentication authentication);
 }

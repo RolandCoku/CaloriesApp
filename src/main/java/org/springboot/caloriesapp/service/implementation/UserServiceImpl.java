@@ -7,6 +7,7 @@ import org.springboot.caloriesapp.model.User;
 import org.springboot.caloriesapp.repository.RoleRepository;
 import org.springboot.caloriesapp.repository.UserRepository;
 import org.springboot.caloriesapp.service.UserService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -113,6 +114,20 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> getAllUserWhoExceededMonthlyPriceLimit(){
         double monthlyLimit = 1000.0;
         return userRepository.findUsersExceedingMonthlyLimit(monthlyLimit).stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Long getUserIdByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::getId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public boolean isAdmin(Authentication authentication) {
+        String username = authentication.getName();
+        Optional<User> user = userRepository.findByUsername(username);
+        return user.map(value -> value.getRole().getName().equals("ADMIN")).orElse(false);
     }
 
     private UserDTO mapToDTO(User user) {

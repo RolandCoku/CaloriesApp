@@ -8,6 +8,7 @@ class CaloriesAppApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }

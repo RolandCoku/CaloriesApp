@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/register", "/login", "/css/**", "/images/**").permitAll() // Public endpoints
+                        .requestMatchers("/register", "/login", "/css/**", "/images/**", "/js/**").permitAll() // Public endpoints
                         .anyRequest().permitAll() //TODO CHANGE TO authenticated() FOR PRODUCTION
                 )
                 .formLogin(form -> form
