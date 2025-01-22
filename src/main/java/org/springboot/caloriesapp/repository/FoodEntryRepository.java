@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FoodEntryRepository extends JpaRepository<FoodEntry, Long> {
@@ -19,4 +20,7 @@ public interface FoodEntryRepository extends JpaRepository<FoodEntry, Long> {
 
     @Query("SELECT f FROM FoodEntry f WHERE f.user.id = :userId AND f.createdAt BETWEEN :startOfTheDay AND :endOfTheDay")
     public List<FoodEntry> findAllByUserIdAndCreatedAtBetween(Long userId, LocalDateTime startOfTheDay, LocalDateTime endOfTheDay);
+
+    @Query("SELECT f FROM FoodEntry f WHERE f.user.id = :userId AND f.id = :id")
+    Optional<FoodEntry> findByIdAndUserId(Long id, Long userId);
 }
