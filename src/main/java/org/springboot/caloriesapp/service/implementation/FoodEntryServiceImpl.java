@@ -1,5 +1,6 @@
 package org.springboot.caloriesapp.service.implementation;
 
+import org.springboot.caloriesapp.dto.FoodEntryAdminDTO;
 import org.springboot.caloriesapp.dto.FoodEntryDTO;
 import org.springboot.caloriesapp.model.FoodEntry;
 import org.springboot.caloriesapp.repository.FoodEntryRepository;
@@ -146,6 +147,63 @@ public class FoodEntryServiceImpl implements FoodEntryService {
         return totalCalories / (foodEntriesOnTheLastWeek.isEmpty() ? 1 : foodEntriesOnTheLastWeek.size());
     }
 
+    // ----------------------- Admin-Specific Methods -----------------------
+
+    @Override
+    public List<FoodEntryAdminDTO> getAllFoodEntries() {
+        return foodEntryRepository.findAll()
+                .stream()
+                .map(this::mapToFoodEntryAdminDTO)
+                .toList();
+    }
+
+    @Override
+    public FoodEntryAdminDTO getFoodEntryById(Long id) {
+        return foodEntryRepository.findById(id)
+                .map(this::mapToFoodEntryAdminDTO)
+                .orElseThrow(() -> new RuntimeException("Food entry not found"));
+    }
+
+    @Override
+    public FoodEntryAdminDTO addFoodEntryForUser(FoodEntryAdminDTO foodEntryAdminDTO) {
+        FoodEntry foodEntry = new FoodEntry();
+        foodEntry.setName(foodEntryAdminDTO.getName());
+        foodEntry.setCalories(foodEntryAdminDTO.getCalories());
+        foodEntry.setPrice(foodEntryAdminDTO.getPrice());
+        foodEntry.setUser(userRepository.findById(foodEntryAdminDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
+        foodEntry.setCreatedAt(LocalDateTime.now());
+        foodEntry.setUpdatedAt(LocalDateTime.now());
+
+        return mapToFoodEntryAdminDTO(foodEntryRepository.save(foodEntry));
+    }
+
+    @Override
+    public void deleteFoodEntryById(Long id) {
+        FoodEntry foodEntry = foodEntryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Food entry not found"));
+        foodEntryRepository.delete(foodEntry);
+    }
+
+    @Override
+    public FoodEntryAdminDTO updateFoodEntryById(Long id, FoodEntryDTO foodEntryDTO) {
+        FoodEntry foodEntry = foodEntryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Food entry not found"));
+
+        if (foodEntryDTO.getName() != null) {
+            foodEntry.setName(foodEntryDTO.getName());
+        }
+        if (foodEntryDTO.getCalories() != null) {
+            foodEntry.setCalories(foodEntryDTO.getCalories());
+        }
+        if (foodEntryDTO.getPrice() != null) {
+            foodEntry.setPrice(foodEntryDTO.getPrice());
+        }
+        foodEntry.setUpdatedAt(LocalDateTime.now());
+
+        return mapToFoodEntryAdminDTO(foodEntryRepository.save(foodEntry));
+    }
+
     // ----------------------- Utility Method -----------------------
 
     private FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry) {
@@ -157,5 +215,19 @@ public class FoodEntryServiceImpl implements FoodEntryService {
         foodEntryDTO.setCreatedAt(foodEntry.getCreatedAt());
         foodEntryDTO.setUpdatedAt(foodEntry.getUpdatedAt());
         return foodEntryDTO;
+    }
+
+    private FoodEntryAdminDTO mapToFoodEntryAdminDTO(FoodEntry foodEntry) {
+        FoodEntryAdminDTO foodEntryAdminDTO = new FoodEntryAdminDTO();
+        foodEntryAdminDTO.setId(foodEntry.getId());
+        foodEntryAdminDTO.setName(foodEntry.getName());
+        foodEntryAdminDTO.setCalories(foodEntry.getCalories());
+        foodEntryAdminDTO.setPrice(foodEntry.getPrice());
+        foodEntryAdminDTO.setCreatedAt(foodEntry.getCreatedAt());
+        foodEntryAdminDTO.setUpdatedAt(foodEntry.getUpdatedAt());
+        if (foodEntry.getUser() != null) {
+            foodEntryAdminDTO.setUserId(foodEntry.getUser().getId());
+        }
+        return foodEntryAdminDTO;
     }
 }

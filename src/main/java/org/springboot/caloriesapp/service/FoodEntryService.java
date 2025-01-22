@@ -22,4 +22,11 @@ public interface FoodEntryService {
     Double getTotalCaloriesForUserByDate(Long userId, LocalDate date);
     Double getTotalCaloriesForUserByDateRange(Long userId, LocalDate startDate, LocalDate endDate);
     Double getWeaklyAverageCaloriesByUser(Long userId);
+
+    // Admin-specific methods
+    List<FoodEntryAdminDTO> getAllFoodEntries(); // Fetch all entries
+    FoodEntryAdminDTO getFoodEntryById(Long id); // Fetch entry by ID without filtering
+    FoodEntryAdminDTO addFoodEntryForUser(FoodEntryAdminDTO foodEntryAdminDTO); // Includes userId in DTO
+    void deleteFoodEntryById(Long id); // Delete entry by ID without filtering
+    FoodEntryAdminDTO updateFoodEntryById(Long id, FoodEntryDTO foodEntryDTO);
 }
