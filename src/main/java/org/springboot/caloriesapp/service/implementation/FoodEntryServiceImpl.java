@@ -22,6 +22,8 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     private final FoodEntryRepository foodEntryRepository;
     private final UserRepository userRepository;
+    private final int CALORIE_LIMIT = 2500;
+    private final double SPENDING_LIMIT = 1000.0;
 
     public FoodEntryServiceImpl(FoodEntryRepository foodEntryRepository, UserRepository userRepository) {
         this.foodEntryRepository = foodEntryRepository;
@@ -290,10 +292,80 @@ public class FoodEntryServiceImpl implements FoodEntryService {
                 }).toList();
     }
 
-    // ----------------------- Utility Method -----------------------
+    @Override
+    public Double getTotalSpendingForUserByDate(Long userId, LocalDate parsedDate) {
+        return foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                        userId,
+                        parsedDate.atStartOfDay(),
+                        parsedDate.atTime(LocalTime.MAX))
+                .stream()
+                .mapToDouble(FoodEntry::getPrice)
+                .sum();
+    }
 
     @Override
-    public FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry) {
+    public List<?> getWeeklySpendingForUser(Long userId) {
+        //Get last 7-day food entries
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                userId,
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now());
+
+        //Get total calories for each day
+        return foodEntriesOnTheLastWeek.stream()
+                // Group by date (ignoring time)
+                .collect(Collectors.groupingBy(entry -> entry.getCreatedAt().toLocalDate()))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    // Sum the calories for all entries on the same date
+                    double totalSpending = entry.getValue().stream()
+                            .mapToDouble(FoodEntry::getPrice)
+                            .sum();
+                    // Map the result with day of the week and total calories
+                    return Map.of(
+                            "day", entry.getKey().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH),
+                            "totalSpending", totalSpending
+                    );
+                })
+                .toList();
+    }
+
+    @Override
+    public List<?> getWeeklySummary(Long userId) {
+        //Get last 7-day food entries
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                userId,
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now());
+
+        // Get the total calories, total spending's and days that the total calorie was above the threshold for the week
+        double totalCalories = foodEntriesOnTheLastWeek.stream()
+                .mapToDouble(FoodEntry::getCalories)
+                .sum();
+        double totalSpending = foodEntriesOnTheLastWeek.stream()
+                .mapToDouble(FoodEntry::getPrice)
+                .sum();
+        long daysOverCalorieLimit = foodEntriesOnTheLastWeek.stream()
+                .collect(Collectors.groupingBy(entry -> entry.getCreatedAt().toLocalDate()))
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().stream()
+                        .mapToDouble(FoodEntry::getCalories)
+                        .sum() > CALORIE_LIMIT)
+                .count();
+
+        return List.of(Map.of(
+                "totalCaloriesConsumed", totalCalories,
+                "totalSpendings", totalSpending,
+                "daysOverCalorieLimit", daysOverCalorieLimit
+        ));
+
+    }
+
+    // ----------------------- Utility Method -----------------------
+
+    private FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry) {
         FoodEntryDTO foodEntryDTO = new FoodEntryDTO();
         foodEntryDTO.setId(foodEntry.getId());
         foodEntryDTO.setName(foodEntry.getName());

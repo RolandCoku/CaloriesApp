@@ -200,6 +200,22 @@ public class FoodEntryController {
         }
     }
 
+    // Get total spending for the authenticated user by date
+    @GetMapping("/user/total-spending/date/{date}")
+    public ResponseEntity<?> getTotalSpendingForUserByDate(
+            @PathVariable String date,
+            Authentication authentication) {
+        try {
+            Long userId = getAuthenticatedUserId(authentication);
+            LocalDate parsedDate = LocalDate.parse(date);
+            return ResponseEntity.ok(foodEntryService.getTotalSpendingForUserByDate(userId, parsedDate));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Please use YYYY-MM-DD.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving total spending: " + e.getMessage());
+        }
+    }
+
     //Get the last week's spending total for the authenticated user
     @GetMapping("/user/weekly-average/spending")
     public ResponseEntity<?> getWeeklyAverageSpendingForUser(Authentication authentication) {
@@ -222,6 +238,17 @@ public class FoodEntryController {
         }
     }
 
+    // Get the spending for every day of the week for the authenticated user
+    @GetMapping("/user/weekly-spending")
+    public ResponseEntity<?> getWeeklySpendingForUser(Authentication authentication) {
+        try {
+            Long userId = getAuthenticatedUserId(authentication);
+            return ResponseEntity.ok(foodEntryService.getWeeklySpendingForUser(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving weekly spending: " + e.getMessage());
+        }
+    }
+
     // Get the days when the user exceeded the daily calorie limit
     @GetMapping("/user/days-over-limit")
     public ResponseEntity<?> getDaysOverCalorieLimit(Authentication authentication) {
@@ -230,6 +257,17 @@ public class FoodEntryController {
             return ResponseEntity.ok(foodEntryService.getDaysOverCalorieLimit(userId));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving days over calorie limit: " + e.getMessage());
+        }
+    }
+
+    // Weekly Summary
+    @GetMapping("/user/weekly-summary")
+    public ResponseEntity<?> getWeeklySummary(Authentication authentication) {
+        try {
+            Long userId = getAuthenticatedUserId(authentication);
+            return ResponseEntity.ok(foodEntryService.getWeeklySummary(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving weekly summary: " + e.getMessage());
         }
     }
 

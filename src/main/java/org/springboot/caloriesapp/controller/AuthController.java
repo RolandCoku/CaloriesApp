@@ -21,8 +21,8 @@ public class AuthController {
         return "user/index";
     }
 
-    @GetMapping("/user/days-over-limit")
-    public String daysOverLimit() {
-        return "/user/list-days";
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin/index";
     }
 }

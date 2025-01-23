@@ -39,5 +39,9 @@ public interface FoodEntryService {
 
     List<?> getDaysOverCalorieLimit(Long userId);
 
-    FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry);
+    Double getTotalSpendingForUserByDate(Long userId, LocalDate parsedDate);
+
+    List<?> getWeeklySpendingForUser(Long userId);
+
+    List<?> getWeeklySummary(Long userId);
 }
