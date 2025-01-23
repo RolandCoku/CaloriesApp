@@ -29,8 +29,6 @@ public class SecurityConfig {
                 .csrf().disable() // Disable CSRF for simplicity and testing
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/register", "/login", "/css/**", "/images/**", "/js/**").permitAll() // Public endpoints
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

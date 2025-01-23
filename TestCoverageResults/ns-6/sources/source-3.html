@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springboot.caloriesapp.service.implementation</a>
+</div>
+
+<h1>Coverage Summary for Class: UserServiceImpl (org.springboot.caloriesapp.service.implementation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (8/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (21/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (55/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.springboot.caloriesapp.service.implementation;
+&nbsp;
+&nbsp;import org.springboot.caloriesapp.dto.RegisterUserDTO;
+&nbsp;import org.springboot.caloriesapp.dto.UserDTO;
+&nbsp;import org.springboot.caloriesapp.model.Role;
+&nbsp;import org.springboot.caloriesapp.model.User;
+&nbsp;import org.springboot.caloriesapp.repository.RoleRepository;
+&nbsp;import org.springboot.caloriesapp.repository.UserRepository;
+&nbsp;import org.springboot.caloriesapp.service.UserService;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class UserServiceImpl implements UserService {
+&nbsp;
+&nbsp;
+&nbsp;    private final UserRepository userRepository;
+&nbsp;    private final RoleRepository roleRepository;
+&nbsp;    private final PasswordEncoder passwordEncoder;
+&nbsp;
+<b class="fc">&nbsp;    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {</b>
+<b class="fc">&nbsp;        this.userRepository = userRepository;</b>
+<b class="fc">&nbsp;        this.roleRepository = roleRepository;</b>
+<b class="fc">&nbsp;        this.passwordEncoder = passwordEncoder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UserDTO registerUser(RegisterUserDTO registerUserDTO) {
+&nbsp;
+&nbsp;        //Check if the password and password confirmation match
+<b class="fc">&nbsp;        if (!registerUserDTO.getPassword().equals(registerUserDTO.getConfirmPassword())) {</b>
+<b class="fc">&nbsp;            throw new RuntimeException(&quot;Passwords do not match&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //Check if the username already exists
+<b class="fc">&nbsp;        if (userRepository.existsByUsername(registerUserDTO.getUsername())) {</b>
+<b class="fc">&nbsp;            throw new RuntimeException(&quot;Username already exists&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //Check if the email already exists
+<b class="fc">&nbsp;        if (userRepository.existsByEmail(registerUserDTO.getEmail())) {</b>
+<b class="fc">&nbsp;            throw new RuntimeException(&quot;Email already exists&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //Find the role by ID
+<b class="fc">&nbsp;        Role role = roleRepository.findByName(&quot;USER&quot;)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Role not found&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        User user = new User();</b>
+<b class="fc">&nbsp;        user.setName(registerUserDTO.getFirstName() + &quot; &quot; + registerUserDTO.getLastName());</b>
+<b class="fc">&nbsp;        user.setUsername(registerUserDTO.getUsername());</b>
+<b class="fc">&nbsp;        user.setEmail(registerUserDTO.getEmail());</b>
+<b class="fc">&nbsp;        user.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));</b>
+<b class="fc">&nbsp;        user.setRole(role);</b>
+<b class="fc">&nbsp;        user = userRepository.save(user);</b>
+&nbsp;
+<b class="fc">&nbsp;        return mapToDTO(user);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UserDTO getUserById(Long id) {
+<b class="fc">&nbsp;        User user = userRepository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</b>
+<b class="fc">&nbsp;        return mapToDTO(user);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;UserDTO&gt; getAllUsers() {
+<b class="fc">&nbsp;        return userRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UserDTO updateUser(Long id, UserDTO userDTO) {
+<b class="fc">&nbsp;        User user = userRepository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        if (userDTO.getFirstName() != null &amp;&amp; userDTO.getLastName() != null) {</b>
+<b class="fc">&nbsp;            user.setName(userDTO.getFirstName() + &quot; &quot; + userDTO.getLastName());</b>
+&nbsp;
+<b class="pc">&nbsp;        } else if (userDTO.getFirstName() != null &amp;&amp; userDTO.getLastName() == null) {</b>
+<b class="fc">&nbsp;            user.setName(userDTO.getFirstName() + &quot; &quot; + user.getName().split(&quot; &quot;)[1]);</b>
+&nbsp;
+<b class="pc">&nbsp;        }else if (userDTO.getLastName() != null &amp;&amp; userDTO.getFirstName() == null) {</b>
+<b class="fc">&nbsp;            user.setName(user.getName().split(&quot; &quot;)[0] + &quot; &quot; + userDTO.getLastName());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (userDTO.getUsername() != null) {</b>
+<b class="fc">&nbsp;            user.setUsername(userDTO.getUsername());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (userDTO.getEmail() != null) {</b>
+<b class="fc">&nbsp;            user.setEmail(userDTO.getEmail());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        user = userRepository.save(user);</b>
+<b class="fc">&nbsp;        return mapToDTO(user);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void deleteUser(Long id) {
+<b class="fc">&nbsp;        if (!userRepository.existsById(id)) {</b>
+<b class="fc">&nbsp;            throw new RuntimeException(&quot;User not found&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        userRepository.deleteById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;UserDTO&gt; getAllUserWhoExceededMonthlyPriceLimit(){
+<b class="nc">&nbsp;        double monthlyLimit = 1000.0;</b>
+<b class="nc">&nbsp;        return userRepository.findUsersExceedingMonthlyLimit(monthlyLimit).stream().map(this::mapToDTO).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Long getUserIdByUsername(String username) {
+<b class="fc">&nbsp;        return userRepository.findByUsername(username)</b>
+<b class="fc">&nbsp;                .map(User::getId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isAdmin(Authentication authentication) {
+<b class="nc">&nbsp;        String username = authentication.getName();</b>
+<b class="nc">&nbsp;        Optional&lt;User&gt; user = userRepository.findByUsername(username);</b>
+<b class="nc">&nbsp;        return user.map(value -&gt; value.getRole().getName().equals(&quot;ADMIN&quot;)).orElse(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private UserDTO mapToDTO(User user) {
+<b class="fc">&nbsp;        UserDTO userDTO = new UserDTO();</b>
+<b class="fc">&nbsp;        userDTO.setId(user.getId());</b>
+<b class="fc">&nbsp;        userDTO.setFirstName(user.getName().split(&quot; &quot;)[0]);</b>
+<b class="fc">&nbsp;        userDTO.setLastName(user.getName().split(&quot; &quot;)[1]);</b>
+<b class="fc">&nbsp;        userDTO.setUsername(user.getUsername());</b>
+<b class="fc">&nbsp;        userDTO.setEmail(user.getEmail());</b>
+<b class="fc">&nbsp;        userDTO.setRoleId(user.getRole().getId());</b>
+<b class="fc">&nbsp;        userDTO.setRoleName(user.getRole().getName());</b>
+<b class="fc">&nbsp;        userDTO.setCreatedAt(user.getCreatedAt());</b>
+<b class="fc">&nbsp;        userDTO.setUpdatedAt(user.getUpdatedAt());</b>
+<b class="fc">&nbsp;        return userDTO;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-01-23 14:10</div>
+</div>
+</body>
+</html>

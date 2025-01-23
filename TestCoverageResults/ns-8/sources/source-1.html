@@ -1,0 +1,113 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springboot.caloriesapp.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: UserRepository (org.springboot.caloriesapp.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">UserRepository$MockitoMock$HBf3Arfm</td>
+  </tr>
+  <tr>
+    <td class="name">UserRepository$MockitoMock$HBf3Arfm$auxiliary$HrnnzrUJ</td>
+  </tr>
+  <tr>
+    <td class="name">UserRepository$MockitoMock$HBf3Arfm$auxiliary$zN1hxaqS</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.springboot.caloriesapp.repository;
+&nbsp;
+&nbsp;import org.springboot.caloriesapp.model.User;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;import org.springframework.data.jpa.repository.Query;
+&nbsp;import org.springframework.data.repository.query.Param;
+&nbsp;import org.springframework.stereotype.Repository;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@Repository
+&nbsp;public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+&nbsp;    @Query(&quot;SELECT u FROM User u WHERE u.username = :username&quot;)
+&nbsp;    Optional&lt;User&gt; findByUsername(String username);
+&nbsp;
+&nbsp;    @Query(&quot;SELECT u FROM User u WHERE u.email = :email&quot;)
+&nbsp;    Optional&lt;User&gt; findByEmail(String email);
+&nbsp;
+&nbsp;    @Query(&quot;SELECT CASE WHEN COUNT(u) &gt; 0 THEN true ELSE false END FROM User u WHERE u.username = :username&quot;)
+&nbsp;    boolean existsByUsername(String username);
+&nbsp;
+&nbsp;    @Query(&quot;SELECT CASE WHEN COUNT(u) &gt; 0 THEN true ELSE false END FROM User u WHERE u.email = :email&quot;)
+&nbsp;    boolean existsByEmail(String email);
+&nbsp;
+&nbsp;    @Query(value = &quot;SELECT u.* &quot; +
+&nbsp;            &quot;FROM users u &quot; +
+&nbsp;            &quot;LEFT JOIN food_entries f ON u.id = f.user_id &quot; +
+&nbsp;            &quot;WHERE f.created_at &gt;= DATE_FORMAT(CURRENT_DATE - INTERVAL 1 MONTH, &#39;%Y-%m-01&#39;) &quot; +
+&nbsp;            &quot;AND f.created_at &lt;= CURRENT_TIMESTAMP &quot; +
+&nbsp;            &quot;GROUP BY u.id &quot; +
+&nbsp;            &quot;HAVING SUM(f.price) &gt; :priceLimit&quot;, nativeQuery = true)
+&nbsp;
+&nbsp;    List&lt;User&gt; findUsersExceedingMonthlyLimit(@Param(&quot;priceLimit&quot;) double priceLimit);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-01-23 14:10</div>
+</div>
+</body>
+</html>

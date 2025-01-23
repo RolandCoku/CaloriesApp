@@ -1,0 +1,390 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FoodEntryController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springboot.caloriesapp.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: FoodEntryController (org.springboot.caloriesapp.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FoodEntryController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.9%
+  </span>
+  <span class="absValue">
+    (11/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.7%
+  </span>
+  <span class="absValue">
+    (34/98)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.springboot.caloriesapp.controller;
+&nbsp;
+&nbsp;import jakarta.validation.Valid;
+&nbsp;import org.springboot.caloriesapp.dto.FoodEntryDTO;
+&nbsp;import org.springboot.caloriesapp.service.FoodEntryService;
+&nbsp;import org.springboot.caloriesapp.service.UserService;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.stereotype.Controller;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.format.DateTimeParseException;
+&nbsp;
+&nbsp;@Controller
+&nbsp;@RequestMapping(&quot;/food-entries&quot;)
+&nbsp;public class FoodEntryController {
+&nbsp;
+&nbsp;    private final FoodEntryService foodEntryService;
+&nbsp;    private final UserService userService;
+&nbsp;
+<b class="fc">&nbsp;    public FoodEntryController(FoodEntryService foodEntryService, UserService userService) {</b>
+<b class="fc">&nbsp;        this.foodEntryService = foodEntryService;</b>
+<b class="fc">&nbsp;        this.userService = userService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Utility method to retrieve userId from Authentication
+&nbsp;    private Long getAuthenticatedUserId(Authentication authentication) {
+<b class="fc">&nbsp;        String username = authentication.getName();</b>
+<b class="fc">&nbsp;        return userService.getUserIdByUsername(username);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get all food entries for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/entries&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getFoodEntriesByAuthenticatedUser(Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserId(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving food entries: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    @PostMapping(&quot;/user/add&quot;)
+&nbsp;    public String addFoodEntry(
+&nbsp;            @Valid @ModelAttribute FoodEntryDTO foodEntryDTO,
+&nbsp;            Authentication authentication,
+&nbsp;            RedirectAttributes redirectAttributes) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            foodEntryService.addFoodEntry(userId, foodEntryDTO);</b>
+&nbsp;
+<b class="nc">&nbsp;            redirectAttributes.addFlashAttribute(&quot;successMessage&quot;, &quot;Food entry added successfully!&quot;);</b>
+<b class="nc">&nbsp;            return &quot;redirect:/home&quot;;</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Error adding food entry: &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;            return &quot;redirect:/home&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Update an existing food entry for the authenticated user
+&nbsp;    @PutMapping(&quot;/user/update/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; updateFoodEntry(
+&nbsp;            @PathVariable Long id,
+&nbsp;            @Valid @RequestBody FoodEntryDTO foodEntryDTO,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.updateFoodEntry(userId, id, foodEntryDTO));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error updating food entry: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Delete a food entry for the authenticated user
+&nbsp;    @DeleteMapping(&quot;/user/delete/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; deleteFoodEntry(
+&nbsp;            @PathVariable Long id,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            foodEntryService.deleteFoodEntry(userId, id);</b>
+<b class="fc">&nbsp;            return ResponseEntity.noContent().build();</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error deleting food entry: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get a specific food entry by ID for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getFoodEntryById(
+&nbsp;            @PathVariable Long id,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getFoodEntryById(userId, id));</b>
+<b class="fc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving food entry: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get all food entries by date for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/date/{date}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getFoodEntriesByDate(
+&nbsp;            @PathVariable String date,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            LocalDate parsedDate = LocalDate.parse(date);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDate(userId, parsedDate));</b>
+<b class="nc">&nbsp;        } catch (DateTimeParseException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Invalid date format. Please use YYYY-MM-DD.&quot;);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving food entries: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get food entries by date range for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/date-range&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getFoodEntriesByDateRange(
+&nbsp;            @RequestParam String startDate,
+&nbsp;            @RequestParam String endDate,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            LocalDate parsedStartDate = LocalDate.parse(startDate);</b>
+<b class="fc">&nbsp;            LocalDate parsedEndDate = LocalDate.parse(endDate);</b>
+&nbsp;
+<b class="pc">&nbsp;            if (parsedStartDate.isAfter(parsedEndDate)) {</b>
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(&quot;Start date must be before or equal to end date.&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getFoodEntriesByUserIdAndDateRange(userId, parsedStartDate, parsedEndDate));</b>
+<b class="nc">&nbsp;        } catch (DateTimeParseException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Invalid date format. Please use YYYY-MM-DD.&quot;);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving food entries: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get total calories for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/total-calories&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getTotalCaloriesForUser(Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUser(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving total calories: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get total calories for a specific date for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/total-calories/date/{date}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getTotalCaloriesForUserByDate(
+&nbsp;            @PathVariable String date,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            LocalDate parsedDate = LocalDate.parse(date);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUserByDate(userId, parsedDate));</b>
+<b class="nc">&nbsp;        } catch (DateTimeParseException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Invalid date format. Please use YYYY-MM-DD.&quot;);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving total calories: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get total calories for a date range for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/total-calories/date-range&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getTotalCaloriesForUserByDateRange(
+&nbsp;            @RequestParam String startDate,
+&nbsp;            @RequestParam String endDate,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="fc">&nbsp;            LocalDate parsedStartDate = LocalDate.parse(startDate);</b>
+<b class="fc">&nbsp;            LocalDate parsedEndDate = LocalDate.parse(endDate);</b>
+&nbsp;
+<b class="pc">&nbsp;            if (parsedStartDate.isAfter(parsedEndDate)) {</b>
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(&quot;Start date must be before or equal to end date.&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getTotalCaloriesForUserByDateRange(userId, parsedStartDate, parsedEndDate));</b>
+<b class="nc">&nbsp;        } catch (DateTimeParseException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Invalid date format. Please use YYYY-MM-DD.&quot;);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving total calories: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get the total spending for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/total-spending&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getTotalSpendingForUser(Authentication authentication) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.getTotalSpendingForUser(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving total spending: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get total spending for the authenticated user by date
+&nbsp;    @GetMapping(&quot;/user/total-spending/date/{date}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getTotalSpendingForUserByDate(
+&nbsp;            @PathVariable String date,
+&nbsp;            Authentication authentication) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            LocalDate parsedDate = LocalDate.parse(date);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.getTotalSpendingForUserByDate(userId, parsedDate));</b>
+<b class="nc">&nbsp;        } catch (DateTimeParseException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Invalid date format. Please use YYYY-MM-DD.&quot;);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving total spending: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //Get the last week&#39;s spending total for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/weekly-average/spending&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getWeeklyAverageSpendingForUser(Authentication authentication) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.getWeeklyAverageSpendingForUser(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving weekly average spending: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get the calories for every day of the week for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/weekly-calories&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getWeeklyCaloriesForUser(Authentication authentication) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.getWeeklyCaloriesForUser(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving weekly calories: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get the spending for every day of the week for the authenticated user
+&nbsp;    @GetMapping(&quot;/user/weekly-spending&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getWeeklySpendingForUser(Authentication authentication) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.getWeeklySpendingForUser(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving weekly spending: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get the days when the user exceeded the daily calorie limit
+&nbsp;    @GetMapping(&quot;/user/days-over-limit&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getDaysOverCalorieLimit(Authentication authentication) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.getDaysOverCalorieLimit(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving days over calorie limit: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Weekly Summary
+&nbsp;    @GetMapping(&quot;/user/weekly-summary&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getWeeklySummary(Authentication authentication) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long userId = getAuthenticatedUserId(authentication);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.getWeeklySummary(userId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error retrieving weekly summary: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-01-23 14:10</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AdminController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springboot.caloriesapp.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: AdminController (org.springboot.caloriesapp.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AdminController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.2%
+  </span>
+  <span class="absValue">
+    (13/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.springboot.caloriesapp.controller;
+&nbsp;
+&nbsp;import jakarta.validation.Valid;
+&nbsp;import org.springboot.caloriesapp.dto.FoodEntryAdminDTO;
+&nbsp;import org.springboot.caloriesapp.service.FoodEntryService;
+&nbsp;import org.springboot.caloriesapp.service.UserService;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/admin&quot;)
+&nbsp;public class AdminController {
+&nbsp;
+&nbsp;    private final UserService userService;
+&nbsp;    private final FoodEntryService foodEntryService;
+<b class="fc">&nbsp;    public AdminController(UserService userService, FoodEntryService foodEntryService){</b>
+<b class="fc">&nbsp;        this.userService = userService;</b>
+<b class="fc">&nbsp;        this.foodEntryService = foodEntryService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/users&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getAllUsers(){
+&nbsp;        try {
+<b class="fc">&nbsp;            return ResponseEntity.ok(userService.getAllUsers());</b>
+<b class="nc">&nbsp;        } catch (Exception e){</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/users/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getUserById(@PathVariable Long id){
+&nbsp;        try {
+<b class="nc">&nbsp;            return ResponseEntity.ok(userService.getUserById(id));</b>
+<b class="nc">&nbsp;        } catch (Exception e){</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/users/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; deleteUser(@PathVariable Long id) {
+&nbsp;        try {
+<b class="fc">&nbsp;            userService.deleteUser(id);</b>
+<b class="fc">&nbsp;            return ResponseEntity.noContent().build();</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error deleting user: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //Manage food entries endpoints
+&nbsp;    @GetMapping(&quot;/food-entries&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getAllFoodEntries() {
+&nbsp;        try {
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getAllFoodEntries());</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //Get food entry by id
+&nbsp;    @GetMapping(&quot;/food-entries/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getFoodEntryById(@PathVariable Long id){
+&nbsp;        try {
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getFoodEntryById(id));</b>
+<b class="fc">&nbsp;        } catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Add a new food entry
+&nbsp;    @PostMapping(&quot;/food-entries/create&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; createFoodEntry(@Valid @RequestBody FoodEntryAdminDTO foodEntryAdminDTO) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.addFoodEntryForUser(foodEntryAdminDTO));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Error adding food entry: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Update an existing food entry
+&nbsp;    @PutMapping(&quot;/food-entries/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; updateFoodEntry(
+&nbsp;            @PathVariable Long id,
+&nbsp;            @Valid @RequestBody FoodEntryAdminDTO foodEntryAdminDTO) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return ResponseEntity.ok(foodEntryService.updateFoodEntryById(id, foodEntryAdminDTO));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error updating food entry: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Delete a food entry
+&nbsp;    @DeleteMapping(&quot;/food-entries/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; deleteFoodEntry(@PathVariable Long id) {
+&nbsp;        try {
+<b class="fc">&nbsp;            foodEntryService.deleteFoodEntryById(id);</b>
+<b class="fc">&nbsp;            return ResponseEntity.noContent().build();</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error deleting food entry: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/user/{id}/average-calories&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getWeaklyAverageCaloriesByUser(@PathVariable Long id){
+&nbsp;        try {
+<b class="fc">&nbsp;            return ResponseEntity.ok(foodEntryService.getWeaklyAverageCaloriesByUser(id));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e){</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Error getting average calories for the user: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //Get all users that exceeded the monthly spending limit
+&nbsp;    @GetMapping(&quot;/users/above-price-limit&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getAllUserWhoExceededMonthlyPriceLimit(){
+<b class="nc">&nbsp;        return ResponseEntity.ok(userService.getAllUserWhoExceededMonthlyPriceLimit());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get statistics
+&nbsp;    @GetMapping(&quot;/statistics&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; getStatistics(){
+<b class="nc">&nbsp;        return ResponseEntity.ok(foodEntryService.getStatistics());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-01-23 14:10</div>
+</div>
+</body>
+</html>

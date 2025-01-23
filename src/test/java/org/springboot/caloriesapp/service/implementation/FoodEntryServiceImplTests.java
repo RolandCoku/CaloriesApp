@@ -91,7 +91,11 @@ class FoodEntryServiceImplTests {
     @Test
     void addFoodEntryForUserByAdmin_Successful() {
         // Given
-        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
+        FoodEntryAdminDTO foodEntryAdminDTO = new FoodEntryAdminDTO();
+        foodEntryAdminDTO.setName("Admin Food");
+        foodEntryAdminDTO.setCalories(300.0);
+        foodEntryAdminDTO.setPrice(10.0);
+        foodEntryAdminDTO.setUserEmail(mockUser.getEmail()); // Updated to use email
 
         FoodEntry savedFoodEntry = new FoodEntry();
         savedFoodEntry.setId(200L);
@@ -100,6 +104,7 @@ class FoodEntryServiceImplTests {
         savedFoodEntry.setPrice(10.0);
         savedFoodEntry.setUser(mockUser);
 
+        when(userRepository.findByEmail(mockUser.getEmail())).thenReturn(Optional.of(mockUser)); // Mocking email lookup
         when(foodEntryRepository.save(any(FoodEntry.class))).thenReturn(savedFoodEntry);
 
         // When
@@ -111,7 +116,7 @@ class FoodEntryServiceImplTests {
         assertEquals("Admin Food", result.getName());
         assertEquals(300.0, result.getCalories());
         assertEquals(10.0, result.getPrice());
-        assertEquals(1L, result.getUserId());
+        assertEquals(mockUser.getId(), result.getUserId());
     }
 
 }

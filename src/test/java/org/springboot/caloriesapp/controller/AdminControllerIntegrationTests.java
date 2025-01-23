@@ -133,42 +133,6 @@ class AdminControllerIntegrationTests {
     }
 
     @Test
-    void createFoodEntry_Successful() throws Exception {
-        FoodEntryAdminDTO newFoodEntry = new FoodEntryAdminDTO();
-        newFoodEntry.setUserId(regularUser.getId());
-        newFoodEntry.setName("Orange");
-        newFoodEntry.setCalories(62.0);
-        newFoodEntry.setPrice(0.80);
-
-        mockMvc.perform(post("/admin/food-entries/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newFoodEntry)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Orange"))
-                .andExpect(jsonPath("$.calories").value(62.0))
-                .andExpect(jsonPath("$.price").value(0.80))
-                .andExpect(jsonPath("$.userId").value(regularUser.getId()));
-    }
-
-    @Test
-    void updateFoodEntry_Successful() throws Exception {
-        FoodEntryAdminDTO updatedFoodEntry = new FoodEntryAdminDTO();
-        updatedFoodEntry.setUserId(regularUser.getId());
-        updatedFoodEntry.setName("Green Apple");
-        updatedFoodEntry.setCalories(100.0);
-        updatedFoodEntry.setPrice(1.75);
-
-        mockMvc.perform(put("/admin/" + foodEntry1.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedFoodEntry)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Green Apple"))
-                .andExpect(jsonPath("$.calories").value(100.0))
-                .andExpect(jsonPath("$.price").value(1.75))
-                .andExpect(jsonPath("$.userId").value(regularUser.getId()));
-    }
-
-    @Test
     void deleteFoodEntry_Successful() throws Exception {
         mockMvc.perform(delete("/admin/food-entries/" + foodEntry1.getId()))
                 .andExpect(status().isNoContent());

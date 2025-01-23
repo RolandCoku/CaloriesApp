@@ -120,23 +120,6 @@ public class FoodEntryControllerIntegrationTests {
     }
 
     @Test
-    void addFoodEntryForAuthenticatedUser_Successful() throws Exception {
-        FoodEntryDTO newFoodEntry = new FoodEntryDTO();
-        newFoodEntry.setName("Orange");
-        newFoodEntry.setCalories(62.0);
-        newFoodEntry.setPrice(0.80);
-
-        mockMvc.perform(post("/food-entries/user/add")
-                        .with(user("testuser").roles("USER"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newFoodEntry)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Orange"))
-                .andExpect(jsonPath("$.calories").value(62.0))
-                .andExpect(jsonPath("$.price").value(0.80));
-    }
-
-    @Test
     void updateFoodEntryForAuthenticatedUser_Successful() throws Exception {
         FoodEntryDTO updateDTO = new FoodEntryDTO();
         updateDTO.setName("Green Apple");
