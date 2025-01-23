@@ -3,6 +3,7 @@ package org.springboot.caloriesapp.service.implementation;
 import org.springboot.caloriesapp.dto.FoodEntryAdminDTO;
 import org.springboot.caloriesapp.dto.FoodEntryDTO;
 import org.springboot.caloriesapp.model.FoodEntry;
+import org.springboot.caloriesapp.model.User;
 import org.springboot.caloriesapp.repository.FoodEntryRepository;
 import org.springboot.caloriesapp.repository.UserRepository;
 import org.springboot.caloriesapp.service.FoodEntryService;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -172,12 +174,13 @@ public class FoodEntryServiceImpl implements FoodEntryService {
 
     @Override
     public FoodEntryAdminDTO addFoodEntryForUser(FoodEntryAdminDTO foodEntryAdminDTO) {
+        User user = userRepository.findByEmail(foodEntryAdminDTO.getUserEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         FoodEntry foodEntry = new FoodEntry();
         foodEntry.setName(foodEntryAdminDTO.getName());
         foodEntry.setCalories(foodEntryAdminDTO.getCalories());
         foodEntry.setPrice(foodEntryAdminDTO.getPrice());
-        foodEntry.setUser(userRepository.findById(foodEntryAdminDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found")));
+        foodEntry.setUser(user);
         foodEntry.setCreatedAt(LocalDateTime.now());
         foodEntry.setUpdatedAt(LocalDateTime.now());
 
@@ -334,8 +337,7 @@ public class FoodEntryServiceImpl implements FoodEntryService {
     @Override
     public List<?> getWeeklySummary(Long userId) {
         //Get last 7-day food entries
-        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
-                userId,
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByCreatedAtBetween(
                 LocalDateTime.now().minusDays(7),
                 LocalDateTime.now());
 
@@ -360,8 +362,57 @@ public class FoodEntryServiceImpl implements FoodEntryService {
                 "totalSpendings", totalSpending,
                 "daysOverCalorieLimit", daysOverCalorieLimit
         ));
-
     }
+
+    @Override
+    public List<?> getStatistics() {
+        // Get number of entries on the past 7 days
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByCreatedAtBetween(
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now());
+
+        long entriesCount = foodEntriesOnTheLastWeek.size();
+
+        // Get the average calories per user for the whole time
+        double averageCalories = userRepository.findAll()
+                .stream()
+                .mapToDouble(user -> foodEntryRepository.findAllByUserId(user.getId())
+                        .stream()
+                        .mapToDouble(FoodEntry::getCalories)
+                        .average()
+                        .orElse(0.0))
+                .average()
+                .orElse(0.0);
+
+        // Get the list of users who exceeded the spending limit with more details
+        List<Map<String, Object>> usersExceededSpendingLimit = userRepository.findAll()
+                .stream()
+                .filter(user -> foodEntryRepository.findAllByUserId(user.getId())
+                        .stream()
+                        .mapToDouble(FoodEntry::getPrice)
+                        .sum() > SPENDING_LIMIT)
+                .map(user -> {
+                    Map<String, Object> userDetails = new HashMap<>();
+                    userDetails.put("id", user.getId());
+                    userDetails.put("name", user.getName());
+                    userDetails.put("email", user.getEmail());
+                    userDetails.put("totalSpendings", foodEntryRepository.findAllByUserId(user.getId())
+                            .stream()
+                            .mapToDouble(FoodEntry::getPrice)
+                            .sum());
+                    return userDetails;
+                })
+                .toList();
+
+        return List.of(Map.of(
+                "entriesCount", entriesCount,
+                "averageCalories", averageCalories,
+                "usersExceededSpendingLimit", usersExceededSpendingLimit.size(),
+                "exceedingUsers", usersExceededSpendingLimit
+        ));
+    }
+
+
 
     // ----------------------- Utility Method -----------------------
 

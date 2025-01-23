@@ -44,4 +44,6 @@ public interface FoodEntryService {
     List<?> getWeeklySpendingForUser(Long userId);
 
     List<?> getWeeklySummary(Long userId);
+
+    List<?> getStatistics();
 }

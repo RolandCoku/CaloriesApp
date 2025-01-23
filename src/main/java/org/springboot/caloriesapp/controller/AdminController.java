@@ -28,6 +28,15 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id){
+        try {
+            return ResponseEntity.ok(userService.getUserById(id));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
@@ -69,7 +78,7 @@ public class AdminController {
     }
 
     // Update an existing food entry
-    @PutMapping("/{id}")
+    @PutMapping("/food-entries/{id}")
     public ResponseEntity<?> updateFoodEntry(
             @PathVariable Long id,
             @Valid @RequestBody FoodEntryAdminDTO foodEntryAdminDTO) {
@@ -105,4 +114,11 @@ public class AdminController {
     public ResponseEntity<?> getAllUserWhoExceededMonthlyPriceLimit(){
         return ResponseEntity.ok(userService.getAllUserWhoExceededMonthlyPriceLimit());
     }
+
+    // Get statistics
+    @GetMapping("/statistics")
+    public ResponseEntity<?> getStatistics(){
+        return ResponseEntity.ok(foodEntryService.getStatistics());
+    }
+
 }
