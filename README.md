@@ -1,7 +1,8 @@
-Group:  Roland Çoku 
-       Idna Ademi 
-       Ikeda Laze 
-       Laura Tafilaj 
+Group: <br />
+Roland Çoku <br />
+Idna Ademi <br />
+Ikeda Laze <br />
+Laura Tafilaj <br />
 
 
 Calories Calculation Application
