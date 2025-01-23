@@ -26,15 +26,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .csrf().disable() // Disable CSRF for simplicity and testing
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/register", "/login", "/css/**", "/images/**", "/js/**").permitAll() // Public endpoints
-                        .anyRequest().permitAll() //TODO CHANGE TO authenticated() FOR PRODUCTION
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/user/**").hasRole("USER")
+                        .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/login") // Custom login page
                         .loginProcessingUrl("/login") // URL to process the login
-                        .defaultSuccessUrl("/home", true) // Redirect to home page after successful login
+                        .defaultSuccessUrl("/home", true)
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.getWriter().write("Invalid username or password.");

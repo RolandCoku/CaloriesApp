@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/admin-dashboard.css">
+</head>
+<body>
+<div class="dashboard">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+        <h3>Admin Dashboard</h3>
+        <ul class="sidebar-menu">
+            <li><a href="#" data-target="usersList" class="tab-link active">Users List</a></li>
+            <li><a href="#" data-target="foodEntriesList" class="tab-link">Food Entries List</a></li>
+            <li><a href="#" data-target="statistics" class="tab-link">Statistics</a></li>
+        </ul>
+    </nav>
+
+    <!-- Content -->
+    <div id="content" class="content">
+        <nav class="navbar">
+            <div class="navbar-left">
+                <h1>Calorie Tracker</h1>
+            </div>
+            <div class="navbar-right">
+                <!-- Button to open Add Food Entry Modal -->
+                <button class="btn btn-add-entry" onclick="toggleModal('addFoodEntryModal')">Add Food Entry</button>
+                <a href="/logout">Logout</a>
+            </div>
+        </nav>
+        <div id="usersList" class="tab-content active">
+            <h2>Users List</h2>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="foodEntriesList" class="tab-content">
+            <h2>Food Entries List</h2>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User Email</th>
+                    <th>Food Name</th>
+                    <th>Calories</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="foodEntriesTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="statistics" class="tab-content">
+            <h2>Statistics</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Entries Last Week</h3>
+                    <p id="entriesLastWeek">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Calories per User</h3>
+                    <p id="averageCaloriesPerUser">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Users Exceeding Limit</h3>
+                    <p id="usersExceedingLimit">0</p>
+                </div>
+            </div>
+            <h3>Users Exceeding Calorie Limit</h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Total Calories</th>
+                </tr>
+                </thead>
+                <tbody id="exceedingUsersTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Food Entry Modal -->
+<div id="addFoodEntryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add Food Entry</h2>
+            <span class="close-button" onclick="toggleModal('addFoodEntryModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="addFoodEntryForm">
+                <label for="userEmail">User Email:</label>
+                <input type="email" id="userEmail" name="userEmail" required>
+                <label for="foodName">Food Name:</label>
+                <input type="text" id="foodName" name="name" required>
+                <label for="calories">Calories:</label>
+                <input type="number" id="calories" name="calories" required>
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" required>
+                <button type="submit">Add Entry</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Food Entry Modal -->
+<div id="editFoodEntryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Food Entry</h2>
+            <span class="close-button" onclick="toggleModal('editFoodEntryModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editFoodEntryForm">
+                <input type="hidden" id="editEntryId" name="id"> <!-- Hidden input for entry ID -->
+                <label for="editFoodName">Food Name:</label>
+                <input type="text" id="editFoodName" name="name" required>
+                <label for="editCalories">Calories:</label>
+                <input type="number" id="editCalories" name="calories" required>
+                <label for="editPrice">Price:</label>
+                <input type="number" id="editPrice" name="price" required>
+                <button type="submit">Update Entry</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit User</h2>
+            <span class="close-button" onclick="toggleModal('editUserModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId" name="id"> <!-- Hidden input for user ID -->
+                <label for="editFirstName">First Name:</label>
+                <input type="text" id="editFirstName" name="firstName" required>
+                <label for="editLastName">Last Name:</label>
+                <input type="text" id="editLastName" name="lastName" required>
+                <label for="editUsername">Username:</label>
+                <input type="text" id="editUsername" name="username" required>
+                <label for="editEmail">Email:</label>
+                <input type="email" id="editEmail" name="email" required>
+                <label for="editRole">Role:</label>
+                <select id="editRole" name="roleId" required>
+                    <option value="1">Admin</option>
+                    <option value="2">User</option>
+                </select>
+                <button type="submit">Update User</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/admin-dashboard.js"></script>
+</body>
+</html>

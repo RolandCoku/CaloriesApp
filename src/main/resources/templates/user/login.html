@@ -42,9 +42,7 @@
 
         if (response.ok) {
             // Redirect on success
-            // window.location.href = '/dashboard'; // Change to your redirect URL
-            console.log('Login successful!'); // For testing
-            console.log(response)
+            window.location.href = '/home';
         } else {
             // Display error message on failure
             const errorMessage = await response.text();

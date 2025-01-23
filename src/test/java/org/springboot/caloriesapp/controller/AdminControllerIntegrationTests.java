@@ -52,25 +52,46 @@ class AdminControllerIntegrationTests {
         roleRepository.deleteAll();
 
         // Insert roles
-        Role userRole = new Role("USER");
-        roleRepository.save(userRole);
-
-        Role adminRole = new Role("ADMIN");
+        Role adminRole = new Role();
+        adminRole.setName("ADMIN");
         roleRepository.save(adminRole);
 
+        Role userRole = new Role();
+        userRole.setName("USER");
+        roleRepository.save(userRole);
+
         // Insert users
-        User adminUser = new User("Admin User", "admin", "admin@example.com", "adminpass", adminRole);
+        User adminUser = new User();
+        adminUser.setName("Admin User");
+        adminUser.setUsername("admin");
+        adminUser.setEmail("admin@admin.com");
+        adminUser.setPassword("admin");
+        adminUser.setRole(adminRole);
         userRepository.save(adminUser);
 
-        regularUser = new User("Regular User", "user", "user@example.com", "userpass", userRole);
+        regularUser = new User();
+        regularUser.setName("Regular User");
+        regularUser.setUsername("user");
+        regularUser.setEmail("user@user.com");
+        regularUser.setPassword("user");
+        regularUser.setRole(userRole);
         userRepository.save(regularUser);
 
         // Insert food entries
-        foodEntry1 = new FoodEntry(1L, "Apple", 95.0, 0.50, regularUser);
+        foodEntry1 = new FoodEntry();
+        foodEntry1.setName("Apple");
+        foodEntry1.setCalories(95.0);
+        foodEntry1.setPrice(1.5);
+        foodEntry1.setUser(regularUser);
         foodEntryRepository.save(foodEntry1);
 
-        FoodEntry foodEntry2 = new FoodEntry(2L, "Banana", 105.0, 0.75, regularUser);
+        FoodEntry foodEntry2 = new FoodEntry();
+        foodEntry2.setName("Banana");
+        foodEntry2.setCalories(105.0);
+        foodEntry2.setPrice(0.75);
+        foodEntry2.setUser(regularUser);
         foodEntryRepository.save(foodEntry2);
+
     }
 
     @Test
@@ -78,8 +99,17 @@ class AdminControllerIntegrationTests {
         mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[?(@.username == 'admin')].email").value(hasItem("admin@example.com")))
-                .andExpect(jsonPath("$[?(@.username == 'user')].email").value(hasItem("user@example.com")));
+                .andExpect(jsonPath("$[?(@.username == 'admin')].email").value(hasItem("admin@admin.com")))
+                .andExpect(jsonPath("$[?(@.username == 'user')].email").value(hasItem("user@user.com")));
+
+    }
+
+    @Test
+    void getAllUsers_Empty() throws Exception {
+        userRepository.deleteAll();
+        mockMvc.perform(get("/admin/users"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
     @Test
@@ -151,6 +181,7 @@ class AdminControllerIntegrationTests {
     void getWeeklyAverageCaloriesByUser_Successful() throws Exception {
         mockMvc.perform(get("/admin/user/" + regularUser.getId() + "/average-calories"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(not(isEmptyOrNullString())));
+                .andExpect(content().string("100.0"));
+
     }
 }

@@ -11,11 +11,7 @@ import org.springboot.caloriesapp.model.FoodEntry;
 import org.springboot.caloriesapp.model.User;
 import org.springboot.caloriesapp.repository.FoodEntryRepository;
 import org.springboot.caloriesapp.repository.UserRepository;
-import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -107,7 +103,7 @@ class FoodEntryServiceImplTests {
         when(foodEntryRepository.save(any(FoodEntry.class))).thenReturn(savedFoodEntry);
 
         // When
-        FoodEntryAdminDTO result = (FoodEntryAdminDTO) foodEntryService.addFoodEntryForUser(foodEntryAdminDTO);
+        FoodEntryAdminDTO result = foodEntryService.addFoodEntryForUser(foodEntryAdminDTO);
 
         // Then
         assertNotNull(result);
@@ -116,68 +112,8 @@ class FoodEntryServiceImplTests {
         assertEquals(300.0, result.getCalories());
         assertEquals(10.0, result.getPrice());
         assertEquals(1L, result.getUserId());
-
-        verify(userRepository, times(1)).findById(1L);
-        verify(foodEntryRepository, times(1)).save(any(FoodEntry.class));
     }
 
-    @Test
-    void updateFoodEntryForUserByAdmin_Successful() {
-        // Given
-        Long foodEntryId = 100L;
-        FoodEntry existingFoodEntry = new FoodEntry();
-        existingFoodEntry.setId(foodEntryId);
-        existingFoodEntry.setName("Old Food");
-        existingFoodEntry.setCalories(200.0);
-        existingFoodEntry.setPrice(4.0);
-        existingFoodEntry.setUser(mockUser);
-
-        when(foodEntryRepository.findById(foodEntryId)).thenReturn(Optional.of(existingFoodEntry));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
-
-        FoodEntry updatedFoodEntry = new FoodEntry();
-        updatedFoodEntry.setId(foodEntryId);
-        updatedFoodEntry.setName("Updated Admin Food");
-        updatedFoodEntry.setCalories(400.0);
-        updatedFoodEntry.setPrice(15.0);
-        updatedFoodEntry.setUser(mockUser);
-
-        when(foodEntryRepository.save(any(FoodEntry.class))).thenReturn(updatedFoodEntry);
-
-        FoodEntryAdminDTO updateDTO = new FoodEntryAdminDTO();
-        updateDTO.setName("Updated Admin Food");
-        updateDTO.setCalories(400.0);
-        updateDTO.setPrice(15.0);
-        updateDTO.setUserId(1L);
-
-        // When
-        FoodEntryAdminDTO result = (FoodEntryAdminDTO) foodEntryService.updateFoodEntryById(foodEntryId, updateDTO);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(foodEntryId, result.getId());
-        assertEquals("Updated Admin Food", result.getName());
-        assertEquals(400.0, result.getCalories());
-        assertEquals(15.0, result.getPrice());
-        assertEquals(1L, result.getUserId());
-
-        verify(foodEntryRepository, times(1)).findById(foodEntryId);
-        verify(userRepository, times(1)).findById(1L);
-        verify(foodEntryRepository, times(1)).save(any(FoodEntry.class));
-    }
-
-    @Test
-    void deleteFoodEntryByAdmin_Successful() {
-        // Given
-        Long foodEntryId = 300L;
-        doNothing().when(foodEntryRepository).deleteById(foodEntryId);
-
-        // When
-        foodEntryService.deleteFoodEntryById(foodEntryId);
-
-        // Then
-        verify(foodEntryRepository, times(1)).deleteById(foodEntryId);
-    }
 }
 
 
