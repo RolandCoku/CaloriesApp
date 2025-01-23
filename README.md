@@ -1,3 +1,9 @@
+Group: Roland Çoku
+       Idna Ademi
+       Ikeda Laze
+       Laura Tafilaj
+
+
 Calories Calculation Application
 Overview
 The Calories Calculation Application is a Java-based project that enables users to track their daily calorie intake, food expenses, and receive warnings when exceeding predefined thresholds. 
