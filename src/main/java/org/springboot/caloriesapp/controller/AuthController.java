@@ -20,5 +20,9 @@ public class AuthController {
     public String home() {
         return "user/index";
     }
-    // Implement the logout method here
+
+    @GetMapping("/user/days-over-limit")
+    public String daysOverLimit() {
+        return "/user/list-days";
+    }
 }

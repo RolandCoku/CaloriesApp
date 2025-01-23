@@ -11,5 +11,4 @@ public class CaloriesAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CaloriesAppApplication.class, args);
 	}
-
 }

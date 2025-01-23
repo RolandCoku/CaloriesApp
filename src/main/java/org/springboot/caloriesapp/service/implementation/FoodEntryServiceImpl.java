@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class FoodEntryServiceImpl implements FoodEntryService {
@@ -204,9 +208,92 @@ public class FoodEntryServiceImpl implements FoodEntryService {
         return mapToFoodEntryAdminDTO(foodEntryRepository.save(foodEntry));
     }
 
+    @Override
+    public Double getTotalSpendingForUser(Long userId) {
+        return foodEntryRepository.findAllByUserId(userId)
+                .stream()
+                .mapToDouble(FoodEntry::getPrice)
+                .sum();
+    }
+
+    @Override
+    public Double getWeeklyAverageSpendingForUser(Long userId) {
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                userId,
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now());
+        double totalSpending = foodEntriesOnTheLastWeek.stream()
+                .mapToDouble(FoodEntry::getPrice)
+                .sum();
+
+        return totalSpending / (foodEntriesOnTheLastWeek.isEmpty() ? 1 : foodEntriesOnTheLastWeek.size());
+    }
+
+    @Override
+    public List<?> getWeeklyCaloriesForUser(Long userId) {
+        //Get last 7 days food entries
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                userId,
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now());
+
+        //Get total calories for each day
+        return foodEntriesOnTheLastWeek.stream()
+                // Group by date (ignoring time)
+                .collect(Collectors.groupingBy(entry -> entry.getCreatedAt().toLocalDate()))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    // Sum the calories for all entries on the same date
+                    double totalCalories = entry.getValue().stream()
+                            .mapToDouble(FoodEntry::getCalories)
+                            .sum();
+                    // Map the result with day of the week and total calories
+                    return Map.of(
+                            "day", entry.getKey().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH),
+                            "totalCalories", totalCalories
+                    );
+                })
+                .toList();
+
+    }
+
+    @Override
+    public List<?> getDaysOverCalorieLimit(Long userId) {
+        //Get last 7-day food entries
+        List<FoodEntry> foodEntriesOnTheLastWeek = foodEntryRepository.findAllByUserIdAndCreatedAtBetween(
+                userId,
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now());
+
+        //Get total calories for each day
+        return foodEntriesOnTheLastWeek.stream()
+                // Group by date (ignoring time)
+                .collect(Collectors.groupingBy(entry -> entry.getCreatedAt().toLocalDate()))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    // Sum the calories for all entries on the same date
+                    double totalCalories = entry.getValue().stream()
+                            .mapToDouble(FoodEntry::getCalories)
+                            .sum();
+                    double totalSpending = entry.getValue().stream()
+                            .mapToDouble(FoodEntry::getPrice)
+                            .sum();
+                    // Map the result with day of the week and total calories and total spending
+                    return Map.of(
+                            "date", entry.getKey(),
+                            "day", entry.getKey().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH),
+                            "totalCalories", totalCalories,
+                            "totalSpending", totalSpending
+                    );
+                }).toList();
+    }
+
     // ----------------------- Utility Method -----------------------
 
-    private FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry) {
+    @Override
+    public FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry) {
         FoodEntryDTO foodEntryDTO = new FoodEntryDTO();
         foodEntryDTO.setId(foodEntry.getId());
         foodEntryDTO.setName(foodEntry.getName());

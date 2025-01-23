@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT u.* " +
             "FROM users u " +
-            "JOIN food_entries f ON u.id = f.user_id " +
+            "LEFT JOIN food_entries f ON u.id = f.user_id " +
             "WHERE f.created_at >= DATE_FORMAT(CURRENT_DATE - INTERVAL 1 MONTH, '%Y-%m-01') " +
             "AND f.created_at <= CURRENT_TIMESTAMP " +
             "GROUP BY u.id " +

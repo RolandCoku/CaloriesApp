@@ -7,12 +7,14 @@ import org.springboot.caloriesapp.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-@RestController
+@Controller
 @RequestMapping("/food-entries")
 public class FoodEntryController {
 
@@ -40,17 +42,20 @@ public class FoodEntryController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving food entries: " + e.getMessage());
         }
     }
-
-    // Add a new food entry for the authenticated user
     @PostMapping("/user/add")
-    public ResponseEntity<?> addFoodEntry(
-            @Valid @RequestBody FoodEntryDTO foodEntryDTO,
-            Authentication authentication) {
+    public String addFoodEntry(
+            @Valid @ModelAttribute FoodEntryDTO foodEntryDTO,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
         try {
             Long userId = getAuthenticatedUserId(authentication);
-            return ResponseEntity.ok(foodEntryService.addFoodEntry(userId, foodEntryDTO));
+            foodEntryService.addFoodEntry(userId, foodEntryDTO);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Food entry added successfully!");
+            return "redirect:/home";
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Error adding food entry: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Error adding food entry: " + e.getMessage());
+            return "redirect:/home";
         }
     }
 
@@ -184,14 +189,48 @@ public class FoodEntryController {
         }
     }
 
-    // Get all food entries (Optional: Admin-only access)
-    @GetMapping("/admin/all")
-    public ResponseEntity<?> getAllFoodEntries(Authentication authentication) {
-        // Optionally, restrict this endpoint to admin roles
-        if (userService.isAdmin(authentication)) { // Implement isAdmin in UserService
-            return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied.");
+    // Get the total spending for the authenticated user
+    @GetMapping("/user/total-spending")
+    public ResponseEntity<?> getTotalSpendingForUser(Authentication authentication) {
+        try {
+            Long userId = getAuthenticatedUserId(authentication);
+            return ResponseEntity.ok(foodEntryService.getTotalSpendingForUser(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving total spending: " + e.getMessage());
         }
     }
+
+    //Get the last week's spending total for the authenticated user
+    @GetMapping("/user/weekly-average/spending")
+    public ResponseEntity<?> getWeeklyAverageSpendingForUser(Authentication authentication) {
+        try {
+            Long userId = getAuthenticatedUserId(authentication);
+            return ResponseEntity.ok(foodEntryService.getWeeklyAverageSpendingForUser(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving weekly average spending: " + e.getMessage());
+        }
+    }
+
+    // Get the calories for every day of the week for the authenticated user
+    @GetMapping("/user/weekly-calories")
+    public ResponseEntity<?> getWeeklyCaloriesForUser(Authentication authentication) {
+        try {
+            Long userId = getAuthenticatedUserId(authentication);
+            return ResponseEntity.ok(foodEntryService.getWeeklyCaloriesForUser(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving weekly calories: " + e.getMessage());
+        }
+    }
+
+    // Get the days when the user exceeded the daily calorie limit
+    @GetMapping("/user/days-over-limit")
+    public ResponseEntity<?> getDaysOverCalorieLimit(Authentication authentication) {
+        try {
+            Long userId = getAuthenticatedUserId(authentication);
+            return ResponseEntity.ok(foodEntryService.getDaysOverCalorieLimit(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving days over calorie limit: " + e.getMessage());
+        }
+    }
+
 }

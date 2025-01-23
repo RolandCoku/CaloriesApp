@@ -2,6 +2,7 @@ package org.springboot.caloriesapp.service;
 
 import org.springboot.caloriesapp.dto.FoodEntryAdminDTO;
 import org.springboot.caloriesapp.dto.FoodEntryDTO;
+import org.springboot.caloriesapp.model.FoodEntry;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,4 +30,14 @@ public interface FoodEntryService {
     FoodEntryAdminDTO addFoodEntryForUser(FoodEntryAdminDTO foodEntryAdminDTO); // Includes userId in DTO
     void deleteFoodEntryById(Long id); // Delete entry by ID without filtering
     FoodEntryAdminDTO updateFoodEntryById(Long id, FoodEntryDTO foodEntryDTO);
+
+    Double getTotalSpendingForUser(Long userId);
+
+    Double getWeeklyAverageSpendingForUser(Long userId);
+
+    List<?> getWeeklyCaloriesForUser(Long userId);
+
+    List<?> getDaysOverCalorieLimit(Long userId);
+
+    FoodEntryDTO mapToFoodEntryDTO(FoodEntry foodEntry);
 }

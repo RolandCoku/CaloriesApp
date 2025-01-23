@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login") // Custom login page
                         .loginProcessingUrl("/login") // URL to process the login
+                        .defaultSuccessUrl("/home", true) // Redirect to home page after successful login
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.getWriter().write("Invalid username or password.");

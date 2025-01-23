@@ -21,7 +21,11 @@ public class AdminController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(){
-        return ResponseEntity.ok(userService.getAllUsers());
+        try {
+            return ResponseEntity.ok(userService.getAllUsers());
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/users/{id}")
